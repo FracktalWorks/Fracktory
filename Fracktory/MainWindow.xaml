@@ -1,0 +1,116 @@
+﻿<Window
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="Fracktory.MainWindow"
+        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None">
+    <Grid>
+        <Grid.Resources>
+            <Style TargetType="{x:Type TabControl}">
+                <Setter Property="Background" Value="#4e473f" />
+
+                <Setter Property="BorderBrush" Value="{x:Null}" />
+                <Setter Property="ItemContainerStyle">
+                    <Setter.Value>
+                        <Style>
+                            <Setter Property="FrameworkElement.Height" Value="25"/>
+                            <Setter Property="FrameworkElement.Width" Value="120"/>
+                            <Setter Property="Control.FontSize" Value="15"/>
+                            <Setter Property="Control.Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type TabItem}">
+                                        <Grid Margin="30 0 -40 0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="10"/>
+                                                <ColumnDefinition/>
+                                                <ColumnDefinition Width="10"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Path Data="M10 0 L 0 27 L 10 27 " Fill="{TemplateBinding Background}"/>
+                                            <Rectangle Fill="{TemplateBinding Background}" Grid.Column="1" Stroke="{x:Null}"/>
+                                            <Rectangle x:Name="tab_top" VerticalAlignment="Top" Height="1" Fill="#38342f" Grid.Column="1" />
+                                            <ContentPresenter Grid.Column="1"  ContentSource="Header"  HorizontalAlignment="Center"/>
+                                            <Path Data="M0 27 L 10 27 L0 0" Fill="{TemplateBinding Background}" Grid.Column="2"/>
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter Property="Background" Value="#4e473f"/>
+                                                <Setter Property="Foreground" Value="white"/>
+                                                <Setter Property="BorderBrush" Value="#4e473f"/>
+                                                <Setter Property="Panel.ZIndex" Value="1"/>
+                                                <Setter Property="Height" Value="28"/>
+                                                <Setter Property="Margin" Value="0,0,0,-5"/>
+                                                <Setter TargetName="tab_top" Property="Fill" Value="#FF726F6F" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="False">
+                                                <Setter Property="Background" Value="#433e37"/>
+                                                <Setter Property="Foreground" Value="#b2b0ae"/>
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Grid.Resources>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="35*"/>
+            <RowDefinition Height="537*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" MouseMove="Grid_MouseMove">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="9*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!--
+        <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" MouseMove="Grid_MouseMove"/>
+
+        <Menu Grid.Column="1"  Grid.Row="0" Background="#38342f" Foreground="White" FontSize="15">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open"/>
+                <MenuItem Header="_Close"/>
+                <MenuItem Header="_Save"/>
+            </MenuItem>
+        </Menu>
+  -->
+            <Label Content="Fracktory" Grid.Row="0" Grid.Column="1" FontSize="18" Foreground="white" Width="auto" HorizontalAlignment="Center" />
+           
+
+        </Grid>
+        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" Grid.ColumnSpan="6" Margin="0,0.257,0,0">
+            <TabItem Header="Slic3r">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="7*"/>
+                    </Grid.ColumnDefinitions>
+
+                </Grid>
+            </TabItem>
+            <TabItem Header="Pronterface">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="151*"/>
+                        <ColumnDefinition Width="358*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="4*"/>
+                            <RowDefinition Height="3*"/>
+                            <RowDefinition Height="3*"/>
+                        </Grid.RowDefinitions>
+
+                    </Grid>
+
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+
+
+
+    </Grid>
+</Window>
