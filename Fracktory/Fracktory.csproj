@@ -104,8 +104,15 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="image\" />
     <Folder Include="Slic3r\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="image\close.png" />
+    <Resource Include="image\closeh.png" />
+    <Resource Include="image\min.png" />
+    <Resource Include="image\minh.png" />
+    <Resource Include="image\restore.png" />
+    <Resource Include="image\restoreh.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

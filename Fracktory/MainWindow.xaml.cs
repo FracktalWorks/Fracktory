@@ -31,6 +31,71 @@ namespace Fracktory
             this.DragMove();
         }
 
+        private void bMin_MouseMove(object sender, MouseEventArgs e)
+        {
+            imgMin.Source = new BitmapImage(new Uri("image/minh.png",UriKind.Relative));
+        }
+
+        private void bMin_MouseLeave(object sender, MouseEventArgs e)
+        {
+            imgMin.Source = new BitmapImage(new Uri("image/min.png", UriKind.Relative));
+        }
+
+        private void bMin_Click(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void bRestore_MouseEnter(object sender, MouseEventArgs e)
+        {
+            imgRestore.Source = new BitmapImage(new Uri("image/restoreh.png", UriKind.Relative));
+        }
+
+        private void bRestore_MouseLeave(object sender, MouseEventArgs e)
+        {
+            imgRestore.Source = new BitmapImage(new Uri("image/restore.png", UriKind.Relative));
+        }
+
+        private void bRestore_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState==WindowState.Maximized)
+            {
+                this.WindowState = WindowState.Normal;
+            }
+            else
+            {
+                this.WindowState = WindowState.Maximized;
+            }
+           
+        }
+
+        private void bClose_MouseEnter(object sender, MouseEventArgs e)
+        {
+            imgClose.Source = new BitmapImage(new Uri("image/closeh.png", UriKind.Relative));
+        }
+
+        private void bClose_MouseLeave(object sender, MouseEventArgs e)
+        {
+            imgClose.Source = new BitmapImage(new Uri("image/close.png", UriKind.Relative));
+        }
+
+        private void bClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+
+        private void togleRestore_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                this.WindowState = WindowState.Normal;
+            }
+            else
+            {
+                this.WindowState = WindowState.Maximized;
+            }
+        }
+
     }
 
 

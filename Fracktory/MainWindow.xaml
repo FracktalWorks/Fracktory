@@ -58,11 +58,11 @@
             <RowDefinition Height="35*"/>
             <RowDefinition Height="537*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0" MouseMove="Grid_MouseMove">
+        <Grid Grid.Row="0">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1.5*"/>
                 <ColumnDefinition Width="9*"/>
-                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1.5*"/>
             </Grid.ColumnDefinitions>
 
             <!--
@@ -77,8 +77,29 @@
         </Menu>
   -->
             <Label Content="Fracktory" Grid.Row="0" Grid.Column="1" FontSize="18" Foreground="white" Width="auto" HorizontalAlignment="Center" />
-           
-
+            <Label Name="togleRestore" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" MouseMove="Grid_MouseMove" MouseDoubleClick="togleRestore_MouseDoubleClick"/>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Button Name="bMin"  Grid.Column="0" Background="{x:Null}" BorderBrush="{x:Null}"  VerticalAlignment="Top" MouseMove="bMin_MouseMove" MouseLeave="bMin_MouseLeave" Click="bMin_Click">
+                    <StackPanel>
+                        <Image Name="imgMin" Source="image/min.png" Stretch="UniformToFill"  />
+                    </StackPanel>
+                </Button>
+                <Button Name="bRestore"  Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}"  VerticalAlignment="Top" MouseEnter="bRestore_MouseEnter" MouseLeave="bRestore_MouseLeave" Click="bRestore_Click">
+                    <StackPanel>
+                        <Image Name="imgRestore"  Source="image/restore.png" Stretch="UniformToFill"  />
+                    </StackPanel>
+                </Button>
+                <Button Name="bClose"  Grid.Column="2" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Top" MouseEnter="bClose_MouseEnter" MouseLeave="bClose_MouseLeave" Click="bClose_Click">
+                    <StackPanel>
+                        <Image Name="imgClose" Source="image/close.png" Stretch="UniformToFill"  />
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Grid>
         <TabControl BorderBrush="#FF726F6F" Grid.Row="1" Grid.ColumnSpan="6" Margin="0,0.257,0,0">
             <TabItem Header="Slic3r">
@@ -87,6 +108,23 @@
                         <ColumnDefinition Width="3*"/>
                         <ColumnDefinition Width="7*"/>
                     </Grid.ColumnDefinitions>
+                    <GroupBox Header="Print Settings" BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" VerticalAlignment="Top" Margin="0,20,0,0">
+                        <GroupBox Header="General" BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Margin="0,10,0,0">
+                            <StackPanel>
+                            <WrapPanel>
+                                <Label Content="Height Resolution :" HorizontalAlignment="Right" Foreground="White"></Label>
+                                <ComboBox Width="auto" SelectedIndex="1">
+                                    <ComboBoxItem Content="Low"/>
+                                    <ComboBoxItem Content="Medium"/>
+                                    <ComboBoxItem Content="High"/>
+                                </ComboBox>
+                            </WrapPanel>
+                            <WrapPanel>
+                                <Label Content="Perimeters :" HorizontalAlignment="Right" Foreground="White"></Label>
+                            </WrapPanel>
+                            </StackPanel>
+                        </GroupBox>
+                    </GroupBox>
 
                 </Grid>
             </TabItem>
