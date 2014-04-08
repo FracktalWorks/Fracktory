@@ -1,8 +1,9 @@
 ﻿<Window
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="Fracktory.MainWindow"
-        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None">
+        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None" ResizeMode="CanResizeWithGrip" MinWidth="1024" MinHeight="600">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type TabControl}">
@@ -101,30 +102,139 @@
                 </Button>
             </Grid>
         </Grid>
-        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" Grid.ColumnSpan="6" Margin="0,0.257,0,0">
+        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" Grid.ColumnSpan="6">
             <TabItem Header="Slic3r">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3*"/>
+                        <ColumnDefinition Width="3.5*"/>
                         <ColumnDefinition Width="7*"/>
                     </Grid.ColumnDefinitions>
-                    <GroupBox Header="Print Settings" BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" VerticalAlignment="Top" Margin="0,20,0,0">
-                        <GroupBox Header="General" BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Margin="0,10,0,0">
-                            <StackPanel>
-                            <WrapPanel>
-                                <Label Content="Height Resolution :" HorizontalAlignment="Right" Foreground="White"></Label>
-                                <ComboBox Width="auto" SelectedIndex="1">
-                                    <ComboBoxItem Content="Low"/>
-                                    <ComboBoxItem Content="Medium"/>
-                                    <ComboBoxItem Content="High"/>
-                                </ComboBox>
-                            </WrapPanel>
-                            <WrapPanel>
-                                <Label Content="Perimeters :" HorizontalAlignment="Right" Foreground="White"></Label>
-                            </WrapPanel>
-                            </StackPanel>
-                        </GroupBox>
-                    </GroupBox>
+                    <StackPanel  Orientation="Vertical" Height="auto" Grid.Column="0">
+                        <Expander Foreground="White"  FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="True">
+                            <Expander.Header>
+                                <Label Foreground="White" FontSize="17">PRINT SETTINGS</Label>
+                            </Expander.Header>
+                                <StackPanel  Orientation="Vertical" >
+                                    <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
+                                    <GroupBox.Header>
+                                        <Label Foreground="White" FontSize="17">Layers</Label>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition   Width="1*"></ColumnDefinition>
+                                            <ColumnDefinition   Width="15*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Content="Height Resolution :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
+                                            <ComboBox Width="auto" SelectedIndex="1"  Grid.Column="1">
+                                                <ComboBoxItem Content="Low" />
+                                                <ComboBoxItem Content="Medium"/>
+                                                <ComboBoxItem Content="High"/>
+                                            </ComboBox>
+
+                                            <Label Content="Spiral vase :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
+                                            <CheckBox Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Grid>
+                                    </GroupBox>
+                                    <GroupBox BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto"  >
+                                    <GroupBox.Header>
+                                        <Label Foreground="White" FontSize="17">Infill</Label>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition   Width="1*"></ColumnDefinition>
+                                            <ColumnDefinition   Width="15*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="2*"/>
+                                                <RowDefinition Height="1*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Content="Fill Density :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Background="{x:Null}"/>
+                                            <ComboBox Width="auto" SelectedIndex="2"  Grid.Column="1">
+                                                <ComboBoxItem Content="Hollow" />
+                                                <ComboBoxItem Content="Low" />
+                                                <ComboBoxItem Content="Medium"/>
+                                                <ComboBoxItem Content="High"/>
+                                            </ComboBox>
+                                            <Label Content="Combine Infill every :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1" />
+                                            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                                                <xctk:IntegerUpDown Value="1" Increment="1" Maximum="20"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label Content="layers" Foreground="White"/>
+                                            </StackPanel>
+                                            <Label Content="Only Infill When Needed :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="2"/>
+                                            <CheckBox Grid.Column="1" Grid.Row="2" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                                            <Label Content="Solid Infill every :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="3"/>
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="3" Grid.Column="1">
+                                                <xctk:IntegerUpDown Value="1" Increment="1" Maximum="20" Minimum="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label Content="layers" Foreground="White"/>
+                                            </StackPanel>
+
+                                            <Label Content="Solid Infill threshold levels :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="4"/>
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="1">
+                                                <xctk:IntegerUpDown Value="70" Increment="10" Maximum="200"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label  Foreground="White" Content="mm²" />
+                                            </StackPanel>
+
+                                            <Label  HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="5">
+                                                <TextBlock TextWrapping="Wrap">Only retract when crossing perimeters :</TextBlock>
+                                            </Label>
+                                            <CheckBox Grid.Column="1" Grid.Row="5" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+
+                                            <Label Content="Infill before perimeters :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="6"/>
+                                            <CheckBox Grid.Column="1" Grid.Row="6" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+
+                                    <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
+                                    <GroupBox.Header>
+                                        <Label Foreground="White" FontSize="17">Support Material</Label>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition   Width="1*"></ColumnDefinition>
+                                            <ColumnDefinition   Width="15*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Label Content="Generate Support Material :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
+                                            <CheckBox Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+                                </StackPanel>
+                           
+
+                        </Expander>
+
+
+                    </StackPanel>
+
 
                 </Grid>
             </TabItem>

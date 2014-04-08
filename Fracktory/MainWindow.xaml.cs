@@ -27,8 +27,16 @@ namespace Fracktory
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton== MouseButtonState.Pressed)
-            this.DragMove();
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if (WindowState == WindowState.Maximized)
+                {
+                    this.WindowState = WindowState.Normal;
+                  
+                }
+
+                this.DragMove();
+            }
         }
 
         private void bMin_MouseMove(object sender, MouseEventArgs e)
@@ -86,6 +94,7 @@ namespace Fracktory
 
         private void togleRestore_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+
             if (WindowState == WindowState.Maximized)
             {
                 this.WindowState = WindowState.Normal;
@@ -95,6 +104,8 @@ namespace Fracktory
                 this.WindowState = WindowState.Maximized;
             }
         }
+       
+
 
     }
 
