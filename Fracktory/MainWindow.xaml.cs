@@ -370,6 +370,18 @@ namespace Fracktory
         {
             TabPronterface.IsSelected = true;
         }
+
+        private void chkExpertMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (chkExpertMode.IsChecked==true)
+            {
+                ExpanderExpert.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                ExpanderExpert.Visibility = Visibility.Collapsed;
+            }
+        }
        
 
 
