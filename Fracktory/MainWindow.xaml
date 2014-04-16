@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" x:Class="Fracktory.MainWindow"
     xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
-        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None" ResizeMode="CanResizeWithGrip" MinWidth="1024" MinHeight="600">
+        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None" ResizeMode="CanResizeWithGrip" MinWidth="1024" MinHeight="600" FontFamily="Raleway" Name="FracktoryWindow">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type TabControl}">
@@ -57,60 +57,22 @@
         </Grid.Resources>
 
         <Grid.RowDefinitions>
-            <RowDefinition Height="35*"/>
-            <RowDefinition Height="537*"/>
+            <RowDefinition Height="35px"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.5*"/>
-                <ColumnDefinition Width="9*"/>
-                <ColumnDefinition Width="1.5*"/>
-            </Grid.ColumnDefinitions>
-
-
-            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="6" MouseMove="Grid_MouseMove"/>
-
-            <!--<Menu Grid.Column="0"  Grid.Row="0" Background="#38342f" Foreground="White" FontSize="15">
-            <MenuItem Header="_File">
-                <MenuItem Header="_Open"/>
-                <MenuItem Header="_Close"/>
-                <MenuItem Header="_Save"/>
-            </MenuItem>
-        </Menu>-->
-
-            <Label Content="Fracktory" Grid.Row="0" Grid.Column="1" FontSize="18" Foreground="white" Width="auto" HorizontalAlignment="Center" />
-            <Label Name="togleRestore" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" MouseMove="Grid_MouseMove" MouseDoubleClick="togleRestore_MouseDoubleClick"/>
-            <Grid Grid.Column="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="1*"/>
-                </Grid.ColumnDefinitions>
-                <Button Name="bMin"  Grid.Column="0" Background="{x:Null}" BorderBrush="{x:Null}"  VerticalAlignment="Top" MouseMove="bMin_MouseMove" MouseLeave="bMin_MouseLeave" Click="bMin_Click">
-                    <StackPanel>
-                        <Image Name="imgMin" Source="image/min.png" Stretch="UniformToFill"  />
-                    </StackPanel>
-                </Button>
-                <Button Name="bRestore"  Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}"  VerticalAlignment="Top" MouseEnter="bRestore_MouseEnter" MouseLeave="bRestore_MouseLeave" Click="bRestore_Click">
-                    <StackPanel>
-                        <Image Name="imgRestore"  Source="image/restore.png" Stretch="UniformToFill"  />
-                    </StackPanel>
-                </Button>
-                <Button Name="bClose"  Grid.Column="2" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Top" MouseEnter="bClose_MouseEnter" MouseLeave="bClose_MouseLeave" Click="bClose_Click">
-                    <StackPanel>
-                        <Image Name="imgClose" Source="image/close.png" Stretch="UniformToFill"  />
-                    </StackPanel>
-                </Button>
-            </Grid>
-        </Grid>
-        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" Grid.ColumnSpan="6">
-            <TabItem Header="Slic3r">
+        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" RenderTransformOrigin="0.5,0.5" >
+            <TabControl.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform/>
+                    <TranslateTransform Y="-35"/>
+                </TransformGroup>
+            </TabControl.RenderTransform>
+            <TabItem Header="Slicer" Name="TabSlicer">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="3.5*"/>
-                        <ColumnDefinition Width="7*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.Resources>
+
+                    <!--<Grid.Resources>
                         <DrawingBrush x:Key="check" Viewport="0,0,0.25,0.25" ViewportUnits="Absolute" TileMode="Tile" Opacity="0.2" >
                             <DrawingBrush.Drawing>
                                 <DrawingGroup>
@@ -131,50 +93,41 @@
                                 </DrawingGroup>
                             </DrawingBrush.Drawing>
                         </DrawingBrush>
-                    </Grid.Resources>
-                    <Grid Grid.Column="1">
-                        <HelixToolkit:HelixViewport3D ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True"  >
-                            <HelixToolkit:RectangleVisual3D Width="10" Length="10" Fill="{StaticResource check}" />
-                            <ModelVisual3D>
-                                <ModelVisual3D.Transform>
-                                    <TranslateTransform3D OffsetX="4" OffsetZ="3"/>
-                                </ModelVisual3D.Transform>
-                                
-                                <HelixToolkit:CubeVisual3D SideLength="4" Fill="Blue">
-                                    <HelixToolkit:CubeVisual3D.Transform>
-                                        <Transform3DGroup>
-                                            <TranslateTransform3D OffsetX="2" OffsetZ="1"/>
-                                            <RotateTransform3D>
-                                                <RotateTransform3D.Rotation>
-                                                    <AxisAngleRotation3D Axis="0,1,1" Angle="30"/>
-                                                </RotateTransform3D.Rotation>
-                                            </RotateTransform3D>
-                                            <TranslateTransform3D OffsetZ="3"/>
-                                        </Transform3DGroup>
-                                    </HelixToolkit:CubeVisual3D.Transform>
-                                </HelixToolkit:CubeVisual3D>
-                            </ModelVisual3D>
-                            <HelixToolkit:Teapot />
-                            <HelixToolkit:DefaultLights />
+                    </Grid.Resources>-->
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3.5*"/>
+                        <ColumnDefinition Width="1px"/>
+                        <ColumnDefinition Width="7*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid Grid.Column="1" Background="#FF38342F"/>
+                    <Grid Grid.Column="2">
+                        <HelixToolkit:HelixViewport3D ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" ZoomAroundMouseDownPoint="True">
+                            <HelixToolkit:CoordinateSystemVisual3D Transform="{HelixToolkit:Translate -10, -10, 0}" ArrowLengths="2" />
+                            <!--<HelixToolkit:RectangleVisual3D Width="20" Length="20" Fill="{StaticResource check}" />-->
+                            <HelixToolkit:Teapot Material="{HelixToolkit:Material Red}" />
+                            <!--<HelixToolkit:DefaultLights />-->
                             <HelixToolkit:SunLight/>
-                            <HelixToolkit:GridLinesVisual3D Width="10" Length="10" MinorDistance="1" MajorDistance="1"  Thickness="0.01"/>
+                            <HelixToolkit:GridLinesVisual3D Width="20" Length="20" MinorDistance="1" MajorDistance="1"  Thickness="0.01"/>
                             <!--<HelixToolkit:Teapot ></HelixToolkit:Teapot>-->
+                            <HelixToolkit:CubeVisual3D Center="0,0,9.9" SideLength="20" Material="{HelixToolkit:Material White, Opacity=0}"/>
+
                         </HelixToolkit:HelixViewport3D>
                     </Grid>
                     <StackPanel  Orientation="Vertical" Height="auto" Grid.Column="0">
-                        <Expander Foreground="White"  FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="True">
+                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderPrint" Expanded="ExpanderPrint_Expanded" >
                             <Expander.Header>
-                                <Label Foreground="White" FontSize="17">PRINT SETTINGS</Label>
+                                <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="PRINT SETTINGS"/>
                             </Expander.Header>
                             <StackPanel  Orientation="Vertical" >
                                 <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
                                     <GroupBox.Header>
-                                        <Label Foreground="White" FontSize="17">Layers</Label>
+                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Layers"/>
                                     </GroupBox.Header>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition   Width="1*"></ColumnDefinition>
-                                            <ColumnDefinition   Width="15*"></ColumnDefinition>
+                                            <ColumnDefinition   Width="1*"/>
+                                            <ColumnDefinition   Width="15*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid Grid.Column="1">
                                             <Grid.ColumnDefinitions>
@@ -200,12 +153,12 @@
                                 </GroupBox>
                                 <GroupBox BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto"  >
                                     <GroupBox.Header>
-                                        <Label Foreground="White" FontSize="17">Infill</Label>
+                                        <Label Foreground="White" FontSize="17" Content="Infill"/>
                                     </GroupBox.Header>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition   Width="1*"></ColumnDefinition>
-                                            <ColumnDefinition   Width="15*"></ColumnDefinition>
+                                            <ColumnDefinition   Width="1*"/>
+                                            <ColumnDefinition   Width="15*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid Grid.Column="1">
                                             <Grid.ColumnDefinitions>
@@ -250,7 +203,7 @@
                                             </StackPanel>
 
                                             <Label  HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="5">
-                                                <TextBlock TextWrapping="Wrap">Only retract when crossing perimeters :</TextBlock>
+                                                <TextBlock TextWrapping="Wrap"><Run Text="Only retract when crossing perimeters :"/></TextBlock>
                                             </Label>
                                             <CheckBox Grid.Column="1" Grid.Row="5" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
 
@@ -262,12 +215,12 @@
 
                                 <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
                                     <GroupBox.Header>
-                                        <Label Foreground="White" FontSize="17">Support Material</Label>
+                                        <Label Foreground="White" FontSize="17" Content="Support Material"/>
                                     </GroupBox.Header>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
-                                            <ColumnDefinition   Width="1*"></ColumnDefinition>
-                                            <ColumnDefinition   Width="15*"></ColumnDefinition>
+                                            <ColumnDefinition   Width="1*"/>
+                                            <ColumnDefinition   Width="15*"/>
                                         </Grid.ColumnDefinitions>
                                         <Grid Grid.Column="1">
                                             <Grid.ColumnDefinitions>
@@ -279,18 +232,23 @@
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
+
+                                <Button Width="100" Height="50" Content="Load" Click="Button_Click" />
                             </StackPanel>
 
 
                         </Expander>
-
+                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderFilament" Expanded="ExpanderFilament_Expanded">
+                            <Expander.Header>
+                                <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="FILAMENT SETTINGS"/>
+                            </Expander.Header>
+                            
+                        </Expander>
 
                     </StackPanel>
-
-
                 </Grid>
             </TabItem>
-            <TabItem Header="Pronterface">
+            <TabItem Header="Pronterface" Name="TabPronterface">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="151*"/>
@@ -309,6 +267,57 @@
             </TabItem>
 
         </TabControl>
+
+
+
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="30"/>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition Width="125"/>
+                <ColumnDefinition Width="8*"/>
+                <ColumnDefinition Width="1.5*"/>
+            </Grid.ColumnDefinitions>
+
+
+            <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="5" MouseMove="Grid_MouseMove"/>
+
+            <!--<Menu Grid.Column="0"  Grid.Row="0" Background="#38342f" Foreground="White" FontSize="15">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open"/>
+                <MenuItem Header="_Close"/>
+                <MenuItem Header="_Save"/>
+            </MenuItem>
+        </Menu>-->
+
+            <Label Content="Fracktory" Grid.Row="0" Grid.Column="3" FontSize="18" Foreground="white" Width="auto" HorizontalAlignment="Center" />
+            <Label x:Name="togleRestore" Grid.Row="0" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Stretch" MouseMove="Grid_MouseMove" MouseDoubleClick="togleRestore_MouseDoubleClick"/>
+
+            <Label Grid.Row="0" Grid.Column="1" Name="Slicer_tab_label" MouseUp="Slicer_tab_label_MouseUp" Cursor="Hand" />
+            <Label Grid.Row="0" Grid.Column="2" Name="Pronterface_tab_label" MouseUp="Pronterface_tab_label_MouseUp" Cursor="Hand" />
+            <Grid Grid.Column="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="bMin"  Grid.Column="0" Background="{x:Null}" BorderBrush="{x:Null}"  VerticalAlignment="Top" MouseMove="bMin_MouseMove" MouseLeave="bMin_MouseLeave" Click="bMin_Click">
+                    <StackPanel>
+                        <Image x:Name="imgMin" Source="image/min.png" Stretch="UniformToFill"  />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="bRestore"  Grid.Column="1" Background="{x:Null}" BorderBrush="{x:Null}"  VerticalAlignment="Top" MouseEnter="bRestore_MouseEnter" MouseLeave="bRestore_MouseLeave" Click="bRestore_Click">
+                    <StackPanel>
+                        <Image x:Name="imgRestore"  Source="image/restore.png" Stretch="UniformToFill"  />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="bClose"  Grid.Column="2" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Top" MouseEnter="bClose_MouseEnter" MouseLeave="bClose_MouseLeave" Click="bClose_Click">
+                    <StackPanel>
+                        <Image x:Name="imgClose" Source="image/close.png" Stretch="UniformToFill"  />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Grid>
 
 
 

@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Fracktory
 {
-    class Slicer
+    class SlicerAdapter
     {
-        PrintConfiguration config = new PrintConfiguration();
+
 
     }
 }
