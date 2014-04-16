@@ -14,6 +14,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using WinInterop = System.Windows.Interop;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
+using System.Windows.Media.Media3D;
+using HelixToolkit.Wpf;
 
 namespace Fracktory
 {
@@ -22,13 +25,17 @@ namespace Fracktory
     /// </summary>
     public partial class MainWindow : Window
     {
+        public Model3D currentModel;
         public MainWindow()
         {
             InitializeComponent();
+            this.DataContext = new MainViewModel(new FileDialogService(), Viewport);
             FracktoryWindow.Loaded += new RoutedEventHandler(win_Loaded);
             FracktoryWindow.SourceInitialized += new EventHandler(win_SourceInitialized);
         }
 
+
+        #region  size_details
         void win_SourceInitialized(object sender, EventArgs e)
         {
             System.IntPtr handle = (new WinInterop.WindowInteropHelper(this)).Handle;
@@ -37,12 +44,7 @@ namespace Fracktory
 
 
 
-        private static System.IntPtr WindowProc(
-              System.IntPtr hwnd,
-              int msg,
-              System.IntPtr wParam,
-              System.IntPtr lParam,
-              ref bool handled)
+        private static System.IntPtr WindowProc(System.IntPtr hwnd,int msg,System.IntPtr wParam,System.IntPtr lParam,ref bool handled)
         {
             switch (msg)
             {
@@ -266,6 +268,8 @@ namespace Fracktory
         [DllImport("User32")]
         internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
 
+#endregion
+
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -382,7 +386,20 @@ namespace Fracktory
                 ExpanderExpert.Visibility = Visibility.Collapsed;
             }
         }
-       
+
+        private void btnLoad_Click(object sender, RoutedEventArgs e)
+        {
+            //OpenFileDialog _ofd = new OpenFileDialog();
+            //_ofd.Filter = "Steriolithigraphical File (*.stl)|*.stl";
+            //_ofd.Title = "Open File";
+            //if (_ofd.ShowDialog() == true)
+            //{
+            //    var importer = new HelixToolkit.Wpf.ModelImporter();
+            //    var groupLoad = importer.Load("_ofd.FileName;");
+               
+            //    //CurrentModel = await this.LoadAsync(this.CurrentModelPath, false);
+            //}
+        }
 
 
     }

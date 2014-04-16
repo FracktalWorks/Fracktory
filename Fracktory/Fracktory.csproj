@@ -87,7 +87,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DelegateCommand.cs" />
+    <Compile Include="FileDialogService.cs" />
+    <Compile Include="IFileDialogService.cs" />
+    <Compile Include="MainViewModel.cs" />
+    <Compile Include="Observable.cs" />
     <Compile Include="SlicerAdapter.cs" />
+    <Compile Include="VisualViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
