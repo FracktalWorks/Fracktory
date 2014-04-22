@@ -85,25 +85,27 @@
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="10*"/>
-                                <RowDefinition Height="1*"/>
+                                <RowDefinition Height="2.5*"/>
                             </Grid.RowDefinitions>
-                            <HelixToolkit:HelixViewport3D ZoomExtentsWhenLoaded="True" ShowCoordinateSystem="True" Name="Viewport"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" >
-                                
+                            <HelixToolkit:HelixViewport3D  ShowCoordinateSystem="True" Name="Viewport"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" >
+
                                 <HelixToolkit:HelixViewport3D.DefaultCamera>
-                                    <PerspectiveCamera Position="0,-50,30" LookDirection="0,50,-30" UpDirection="0,0,1" FieldOfView="60" NearPlaneDistance="1" />
+                                    <PerspectiveCamera Position="0,-200,100" LookDirection="0,200,-100" UpDirection="0,0,1" FieldOfView="60" NearPlaneDistance=".001" />
                                 </HelixToolkit:HelixViewport3D.DefaultCamera>
 
+                                <ModelVisual3D Content="{Binding CurrentModel}" Transform="{HelixToolkit:Translate 0,0,0}" x:Name="model1" />
+                                
+                                <HelixToolkit:RotateManipulator TargetTransform="{Binding Transform, ElementName=model1}" Diameter="30" Transform="{Binding Transform, ElementName=model1}"  AutomationProperties.HelpText="Move"/>
 
                                 <ModelVisual3D x:Name="root" >
-                                    <ModelVisual3D Content="{Binding CurrentModel}" x:Name="cube2" />
-                                    <HelixToolkit:CombinedManipulator CanTranslateX="False" CanTranslateY="False" CanTranslateZ="False" TargetTransform="{Binding Transform, ElementName=cube2}" Diameter="30" />
-                                    <HelixToolkit:CoordinateSystemVisual3D Transform="{HelixToolkit:Translate 0, 0, 0}" ArrowLengths="2" />
+
+                                    <HelixToolkit:CoordinateSystemVisual3D Transform="{HelixToolkit:Translate -100, -100, 0}" ArrowLengths="10" />
                                     <HelixToolkit:SunLight/>
-                                    <HelixToolkit:GridLinesVisual3D Width="200" Length="200" MinorDistance="20" MajorDistance="10"  Thickness="0.3"   />
-                                    <HelixToolkit:CubeVisual3D  SideLength="200" Material="{HelixToolkit:Material White, Opacity=0}"/>
-                                
+                                    <HelixToolkit:GridLinesVisual3D Width="200" Length="200" MinorDistance="20" MajorDistance="10"  Thickness="0.3" x:Name="grid"  />
+                                    <!--<HelixToolkit:CubeVisual3D  SideLength="200" Material="{HelixToolkit:Material White, Opacity=0}" Center="0,0,99.5"/>-->
+
                                 </ModelVisual3D>
-                                
+
                             </HelixToolkit:HelixViewport3D>
                             <Grid Grid.Row="1">
                                 <Grid.ColumnDefinitions>
@@ -116,9 +118,14 @@
                                 </Grid.ColumnDefinitions>
                                 <Button Content="Load" Name="btnLoad"  Command="{Binding FileOpenCommand}"/>
                                 <CheckBox  Name="btnRS" Grid.Column="1" HorizontalAlignment="Stretch" Width="auto" />
+                                <Button Grid.Column="3">
+                                    <Button.Background>
+                                        <ImageBrush ImageSource="image/rotate icon.png"/>
+                                    </Button.Background>
+                                </Button>
                             </Grid>
 
-                            </Grid>
+                        </Grid>
                     </Grid>
                     <StackPanel  Orientation="Vertical" Height="auto" Grid.Column="0">
                         <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderFilament" Expanded="ExpanderFilament_Expanded" UseLayoutRounding="False">

@@ -167,7 +167,16 @@ namespace Fracktory
             this.CurrentModelPath = this.fileDialogService.OpenFileDialog("models", null, OpenFileFilter, ".3ds");
             this.CurrentModel = await this.LoadAsync(this.CurrentModelPath, false);
             this.ApplicationTitle = string.Format(TitleFormatString, this.CurrentModelPath);
-            this.viewport.ZoomExtents(0);
+            this.viewport.ZoomExtents(400);
+            if (currentModel.Bounds.Z <0)
+            {
+                //currentModel.Bounds.Z *= -1;
+            }
+
+            currentModel.Transform = new System.Windows.Media.Media3D.TranslateTransform3D(0,0, -currentModel.Bounds.Z);
+            SlicerAdapter adp = new SlicerAdapter(currentModelPath);
+            
+            
         }
 
         private async Task<Model3DGroup> LoadAsync(string model3DPath, bool freeze)
