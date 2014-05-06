@@ -64,7 +64,7 @@
             <RowDefinition Height="35px"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" RenderTransformOrigin="0.5,0.5" >
+        <TabControl BorderBrush="#FF726F6F" Grid.Row="1" RenderTransformOrigin="0.5,0.5"  >
             <TabControl.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -84,19 +84,48 @@
                     <Grid Grid.Column="2">
                         <Grid>
                             <Grid.RowDefinitions>
+                                <RowDefinition Height="0.75*"/>
+                                <RowDefinition Height="1*"/>
                                 <RowDefinition Height="10*"/>
-                                <RowDefinition Height="2.5*"/>
                             </Grid.RowDefinitions>
-                            <HelixToolkit:HelixViewport3D  ShowCoordinateSystem="True" Name="Viewport"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" >
+                            <HelixToolkit:HelixViewport3D  ShowCoordinateSystem="True" Name="Viewport"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" Grid.Row="2">
 
                                 <HelixToolkit:HelixViewport3D.DefaultCamera>
                                     <PerspectiveCamera Position="0,-200,100" LookDirection="0,200,-100" UpDirection="0,0,1" FieldOfView="60" NearPlaneDistance=".001" />
                                 </HelixToolkit:HelixViewport3D.DefaultCamera>
 
-                                <ModelVisual3D Content="{Binding CurrentModel}" Transform="{HelixToolkit:Translate 0,0,0}" x:Name="model1" />
-                                
-                                <HelixToolkit:RotateManipulator TargetTransform="{Binding Transform, ElementName=model1}" Diameter="30" Transform="{Binding Transform, ElementName=model1}"  AutomationProperties.HelpText="Move"/>
+                                <ModelVisual3D Content="{Binding CurrentModel}"  x:Name="model1" >
+                                    <ModelVisual3D.Transform>
+                                        <Transform3DGroup>
+                                            <RotateTransform3D>
+                                                <RotateTransform3D.Rotation>
+                                                    <AxisAngleRotation3D Axis="1,0,0" Angle="{Binding RotateX}"/>
+                                                </RotateTransform3D.Rotation>
+                                            </RotateTransform3D>
+                                            <RotateTransform3D>
+                                                <RotateTransform3D.Rotation>
+                                                    <AxisAngleRotation3D Axis="0,1,0" Angle="{Binding RotateY}"/>
+                                                </RotateTransform3D.Rotation>
+                                            </RotateTransform3D>
+                                            <RotateTransform3D>
+                                                <RotateTransform3D.Rotation>
+                                                    <AxisAngleRotation3D Axis="0,0,1" Angle="{Binding RotateZ}"/>
+                                                </RotateTransform3D.Rotation>
+                                            </RotateTransform3D>
+                                        </Transform3DGroup>
+                                    </ModelVisual3D.Transform>
 
+                                </ModelVisual3D>
+
+                                <HelixToolkit:RotateManipulator Color="Green"  InnerDiameter="45" Axis="0,1,0" Transform="{Binding Transform, ElementName=model1}" Value="{Binding RotateY}"   Diameter="50" x:Name="RotatorY" Visibility="Collapsed" />
+                                <HelixToolkit:RotateManipulator Color="Red" Axis="1,0,0" InnerDiameter="45" Transform="{Binding Transform, ElementName=model1}" Value="{Binding RotateX}"  Diameter="50" x:Name="RotatorX"  Visibility="Collapsed"/>
+                                <HelixToolkit:RotateManipulator Color="Blue" Axis="0,0,1"  InnerDiameter="45" Transform="{Binding Transform, ElementName=model1}" Value="{Binding RotateZ}"  Diameter="50"  x:Name="RotatorZ" Visibility="Collapsed" />
+                                <HelixToolkit:TranslateManipulator Material="{HelixToolkit:Material Gold}" Diameter="2" Value="{Binding ScaleFactor, Mode=TwoWay}"  Direction="1,0,1" x:Name="ScaleXYZ" Visibility="Collapsed"  />
+
+
+                                <!--<HelixToolkit:RotateManipulator Color="Red" Axis="1,0,0" InnerDiameter="45" Transform="{Binding Transform, ElementName=model1}" TargetTransform="{Binding Transform, ElementName=model1}"  Diameter="50" x:Name="RotatorX"  Visibility="Collapsed"/>
+                                <HelixToolkit:RotateManipulator Color="Blue" Axis="0,0,1"  InnerDiameter="45" Transform="{Binding Transform, ElementName=model1}" TargetTransform="{Binding Transform, ElementName=model1}"  Diameter="50"  x:Name="RotatorZ" Visibility="Collapsed" />
+                                <HelixToolkit:TranslateManipulator Material="{HelixToolkit:Material Gold}" Diameter="2" Value="{Binding ScaleFactor, Mode=TwoWay}"  Direction="1,0,1" x:Name="ScaleXYZ" Visibility="Collapsed"  />-->
                                 <ModelVisual3D x:Name="root" >
 
                                     <HelixToolkit:CoordinateSystemVisual3D Transform="{HelixToolkit:Translate -100, -100, 0}" ArrowLengths="10" />
@@ -107,32 +136,133 @@
                                 </ModelVisual3D>
 
                             </HelixToolkit:HelixViewport3D>
-                            <Grid Grid.Row="1">
+                            <Grid Grid.Row="0" Background="#FF38342F">
+                                
+                                    <StackPanel Orientation="Horizontal">
+                                    <Button Name="btnLoad"  Command="{Binding FileOpenCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  Margin="10,0,0,0">
+                                        <Image Source="image/load.png"/>
+                                    </Button>
+                                    <Button  Name="tglRotate" Command="{Binding ViewRotateCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="tglRotate_Click" IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0">
+                                            <Image Source="image/rotate icon.png" />
+                                        </Button>
+                                    <Button Name="tglScale" Command="{Binding ViewScaleCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="tglScale_Click"  IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0">
+                                            <Image Source="image/scale icon.png"/>
+                                        </Button>
+                                    <Button   Background="{x:Null}"  Command="{Binding ViewZoomExtentsCommand}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0">
+                                        <Image Source="image/camera_reload.png"/>
+                                    </Button>
+
+                                    <Button  Content="Reset Solid" Background="{x:Null}"  Command="{Binding ResetSolidCommand}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  IsEnabled="{Binding ModelLoaded}"  Margin="10,0,0,0"/>
+
+                                    <Button Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right"  IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0" x:Name="btnPrint" Click="btnPrint_Click">
+                                        <Image Source="image/print.png" />
+                                    </Button>
+                                </StackPanel>
+
+                                
+                            </Grid>
+                            
+                            <!-- scale pane -->
+
+                            <Grid Grid.Row="1" x:Name="ScalePanel" Visibility="Collapsed">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                
+                                <StackPanel Background="#FF38342F">
+                                    <TextBlock FontSize="48"   Opacity="0.2">Scale</TextBlock>
+                                </StackPanel>
+                                <StackPanel Background="#FF38342F" Grid.Column="1" Grid.ColumnSpan="2">
+                                    <Slider  Minimum="0" Maximum="500" Value="{Binding ElementName=ScaleXYZ, Path=Value}" Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+                                    
+                                        
+                                    <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeX, StringFormat={}{0:#.00} x }" />
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeY, StringFormat={}{0:#.00} x }" />
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeZ, StringFormat={}{0:#.00} }" />
+                                            <!--Binding ElementName=RBounds,Path=SizeX-->
+                                        </StackPanel>
+
+                                        <TextBlock FontSize="20" Grid.Column="1" HorizontalAlignment="Right"  Opacity="0.2" Text="{Binding StringFormat={}{0:#.00}%,ElementName=ScaleXYZ, Path=Value}"/>
+                                    </Grid>
+                                </StackPanel>
+                                    
+                            </Grid>
+                            <Grid Grid.Row="1" x:Name="RotatePanel" Visibility="Collapsed">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                <Button Content="Load" Name="btnLoad"  Command="{Binding FileOpenCommand}"/>
-                                <CheckBox  Name="btnRS" Grid.Column="1" HorizontalAlignment="Stretch" Width="auto" />
-                                <Button Grid.Column="3">
-                                    <Button.Background>
-                                        <ImageBrush ImageSource="image/rotate icon.png"/>
-                                    </Button.Background>
-                                </Button>
-                            </Grid>
 
+                                <StackPanel Background="#FF38342F">
+                                    <TextBlock FontSize="48"   Opacity="0.2">Rotate</TextBlock>
+                                </StackPanel>
+                                <StackPanel Background="#FF38342F" Grid.Column="1" Grid.ColumnSpan="1">
+                                    <Slider  Minimum="-90" Maximum="90" Value="{Binding RotateX}"  Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                        </Grid.ColumnDefinitions>
+
+
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="X" />
+                                        </StackPanel>
+
+                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateX, StringFormat={}{0:0.0°}}" />
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Background="#FF38342F" Grid.Column="2" Grid.ColumnSpan="1">
+                                    <Slider  Minimum="-90" Maximum="90" Value="{Binding RotateY}"  Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                        </Grid.ColumnDefinitions>
+
+
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="Y" />
+                                        </StackPanel>
+
+                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateY, StringFormat={}{0:0.0°}}" />
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Background="#FF38342F" Grid.Column="3" Grid.ColumnSpan="1">
+                                    <Slider  Minimum="-90" Maximum="90" Value="{Binding RotateZ}"  Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="3*"/>
+                                        </Grid.ColumnDefinitions>
+
+
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="Z" />
+                                        </StackPanel>
+
+                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateZ, StringFormat={}{0:0.0°}}" />
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
                         </Grid>
                     </Grid>
                     <StackPanel  Orientation="Vertical" Height="auto" Grid.Column="0">
-                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderFilament" Expanded="ExpanderFilament_Expanded" UseLayoutRounding="False">
+                        <!--<Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderFilament" Expanded="ExpanderFilament_Expanded" UseLayoutRounding="False">
                             <Expander.Header>
                                 <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="FILAMENT SETTINGS"/>
-                            </Expander.Header>
-                            <StackPanel  Orientation="Vertical" >
+                            </Expander.Header>-->
+                        <StackPanel  Orientation="Vertical"  Background="#FF38342F" >
                                 <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
                                     <GroupBox.Header>
                                         <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Filament Material"/>
@@ -153,145 +283,23 @@
                                             </Grid.RowDefinitions>
 
                                             <Label Content="Filament Type :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
-                                            <ComboBox Width="auto" SelectedIndex="0"  Grid.Column="1">
+                                            <ComboBox x:Name="FilamentType" Width="auto" SelectedIndex="0"  Grid.Column="1">
                                                 <ComboBoxItem Content="ABS" />
                                                 <ComboBoxItem Content="PLA"/>
                                                 <ComboBoxItem Content="Other..."/>
                                             </ComboBox>
 
-                                            <Label Content="Expert Mode :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
-                                            <CheckBox Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Name="chkExpertMode" Click="chkExpertMode_Click"/>
+                                            <!--<Label Content="Expert Mode :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
+                                            <CheckBox Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" Name="chkExpertMode" Click="chkExpertMode_Click"/>-->
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
                             </StackPanel>
 
-                        </Expander>
+                        <!--</Expander>-->
 
-                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderExpert" Expanded="ExpanderFilament_Expanded" UseLayoutRounding="False">
-                            <Expander.Header>
-                                <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="EXPERT SETTINGS"/>
-                            </Expander.Header>
-                            <StackPanel  Orientation="Vertical" >
-                                <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
-                                    <GroupBox.Header>
-                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Temparature (°C)"/>
-                                    </GroupBox.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition   Width="1*"/>
-                                            <ColumnDefinition   Width="15*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid Grid.Column="1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2.5*"/>
-                                                <ColumnDefinition Width="1.5*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1*"/>
-                                                <RowDefinition Height="1*"/>
-                                                <RowDefinition Height="1*"/>
-                                                <RowDefinition Height="1*"/>
-                                            </Grid.RowDefinitions>
-
-                                            <Label Content="Extruder - First Layer :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
-                                            <xctk:IntegerUpDown Value="240" Increment="1" Maximum="270" Minimum="0"  Grid.Column="1" />
-
-                                            <Label Content="Extruder - Other Layers :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
-                                            <xctk:IntegerUpDown Value="240" Increment="1" Maximum="270" Minimum="0"  Grid.Column="1" Grid.Row="1"/>
-
-
-                                            <Label Content="Bed - First Layer :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="2"/>
-                                            <xctk:IntegerUpDown Value="110" Increment="1" Maximum="150" Minimum="0"  Grid.Column="1" Grid.Row="2"/>
-
-                                            <Label Content="Bed - Other Layers :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="3"/>
-                                            <xctk:IntegerUpDown Value="110" Increment="1" Maximum="150" Minimum="0"  Grid.Column="1" Grid.Row="3"/>
-
-                                        </Grid>
-                                    </Grid>
-                                </GroupBox>
-
-
-                                <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
-                                    <GroupBox.Header>
-                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Skirt"/>
-                                    </GroupBox.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition   Width="1*"/>
-                                            <ColumnDefinition   Width="15*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid Grid.Column="1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2.5*"/>
-                                                <ColumnDefinition Width="1.5*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1*"/>
-                                                <RowDefinition Height="1*"/>
-                                                <RowDefinition Height="1*"/>
-                                                <RowDefinition Height="1*"/>
-                                            </Grid.RowDefinitions>
-
-                                            <Label Content="Loops :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
-                                            <xctk:IntegerUpDown Value="1" Increment="1" Maximum="5" Minimum="0"  Grid.Column="1" />
-
-                                            <Label Content="Distance from object :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
-                                            <StackPanel Orientation="Horizontal"  Grid.Row="1" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="6" Increment="1" Maximum="20" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
-                                                <Label  Foreground="White" Content="mm" />
-                                            </StackPanel>
-
-
-                                            <Label Content="Skirt height :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="2"/>
-                                            <StackPanel Orientation="Horizontal"  Grid.Row="2" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="1" Increment="1" Maximum="10" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
-                                                <Label  Foreground="White" Content="layers" />
-                                            </StackPanel>
-                                            <Label Content="Minimum extrusion length :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="3"/>
-                                            <StackPanel Orientation="Horizontal"  Grid.Row="3" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="0" Increment="1" Maximum="10" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
-                                                <Label  Foreground="White" Content="mm" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </Grid>
-                                </GroupBox>
-
-
-                                <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
-                                    <GroupBox.Header>
-                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Brim"/>
-                                    </GroupBox.Header>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition   Width="1*"/>
-                                            <ColumnDefinition   Width="15*"/>
-                                        </Grid.ColumnDefinitions>
-                                        <Grid Grid.Column="1">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="2.5*"/>
-                                                <ColumnDefinition Width="1.5*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition Height="1*"/>
-                                            </Grid.RowDefinitions>
-
-                                            <Label Content="Brim Width :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
-                                            <StackPanel Orientation="Horizontal"  Grid.Row="0" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="0" Increment="1" Maximum="20" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
-                                                <Label  Foreground="White" Content="mm" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </Grid>
-                                </GroupBox>
-
-
-
-                            </StackPanel>
-
-                        </Expander>
-
-                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderPrint" Expanded="ExpanderPrint_Expanded" >
+                        
+                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderPrint">
                             <Expander.Header>
                                 <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="PRINT SETTINGS"/>
                             </Expander.Header>
@@ -316,14 +324,14 @@
                                             </Grid.RowDefinitions>
 
                                             <Label Content="Height Resolution :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
-                                            <ComboBox Width="auto" SelectedIndex="1"  Grid.Column="1">
+                                            <ComboBox x:Name="HeightResolution" Width="auto" SelectedIndex="1"  Grid.Column="1">
                                                 <ComboBoxItem Content="Low" />
                                                 <ComboBoxItem Content="Medium"/>
                                                 <ComboBoxItem Content="High"/>
                                             </ComboBox>
 
                                             <Label Content="Spiral vase :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
-                                            <CheckBox Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <CheckBox x:Name="SpiralVase" Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
@@ -352,7 +360,7 @@
                                             </Grid.RowDefinitions>
 
                                             <Label Content="Fill Density :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Background="{x:Null}"/>
-                                            <ComboBox Width="auto" SelectedIndex="2"  Grid.Column="1">
+                                            <ComboBox x:Name="FillDensity" Width="auto" SelectedIndex="2"  Grid.Column="1">
                                                 <ComboBoxItem Content="Hollow" />
                                                 <ComboBoxItem Content="Low" />
                                                 <ComboBoxItem Content="Medium"/>
@@ -360,31 +368,31 @@
                                             </ComboBox>
                                             <Label Content="Combine Infill every :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1" />
                                             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="1" Increment="1" Maximum="20"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <xctk:IntegerUpDown x:Name="CombineInfillEvery" Value="1" Increment="1" Maximum="20"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
                                                 <Label Content="layers" Foreground="White"/>
                                             </StackPanel>
                                             <Label Content="Only Infill When Needed :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="2"/>
-                                            <CheckBox Grid.Column="1" Grid.Row="2" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <CheckBox x:Name="OnlyInfillWhenNeeded" Grid.Column="1" Grid.Row="2" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                                             <Label Content="Solid Infill every :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="3"/>
                                             <StackPanel Orientation="Horizontal"  Grid.Row="3" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="1" Increment="1" Maximum="20" Minimum="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <xctk:IntegerUpDown x:Name="SolidInfillEvery" Value="1" Increment="1" Maximum="20" Minimum="1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
                                                 <Label Content="layers" Foreground="White"/>
                                             </StackPanel>
 
                                             <Label Content="Solid Infill threshold levels :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="4"/>
                                             <StackPanel Orientation="Horizontal"  Grid.Row="4" Grid.Column="1">
-                                                <xctk:IntegerUpDown Value="70" Increment="10" Maximum="200"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <xctk:IntegerUpDown x:Name="SolidInfillThresholdLevels" Value="70" Increment="10" Maximum="200"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
                                                 <Label  Foreground="White" Content="mm²" />
                                             </StackPanel>
 
                                             <Label  HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="5">
                                                 <TextBlock TextWrapping="Wrap"><Run Text="Only retract when crossing perimeters :"/></TextBlock>
                                             </Label>
-                                            <CheckBox Grid.Column="1" Grid.Row="5" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
+                                            <CheckBox x:Name="OnlyRetractWhenCrossingPerimeters" Grid.Column="1" Grid.Row="5" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"/>
 
                                             <Label Content="Infill before perimeters :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="6"/>
-                                            <CheckBox Grid.Column="1" Grid.Row="6" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <CheckBox x:Name="InfillBeforePerimeters" Grid.Column="1" Grid.Row="6" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
@@ -404,12 +412,135 @@
                                                 <ColumnDefinition Width="1.5*"/>
                                             </Grid.ColumnDefinitions>
                                             <Label Content="Generate Support Material :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
-                                            <CheckBox Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                            <CheckBox x:Name="GenerateSupportMaterial" Grid.Column="1" Grid.Row="1" Width="auto" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
                                     </Grid>
                                 </GroupBox>
                             </StackPanel>
                         </Expander>
+                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderExpert" Expanded="ExpanderFilament_Expanded" UseLayoutRounding="False" Visibility="Visible">
+                            <Expander.Header>
+                                <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="EXPERT SETTINGS"/>
+                            </Expander.Header>
+                            <StackPanel  Orientation="Vertical" >
+                                <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
+                                    <GroupBox.Header>
+                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Temparature (°C)"/>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition   Width="1*"/>
+                                            <ColumnDefinition   Width="15*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Content="Extruder - First Layer :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
+                                            <xctk:IntegerUpDown x:Name="ExtruderFirstLayer" Value="240" Increment="1" Maximum="270" Minimum="0"  Grid.Column="1" />
+
+                                            <Label Content="Extruder - Other Layers :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
+                                            <xctk:IntegerUpDown x:Name="ExtruderOtherLayers" Value="240" Increment="1" Maximum="270" Minimum="0"  Grid.Column="1" Grid.Row="1"/>
+
+
+                                            <Label Content="Bed - First Layer :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="2"/>
+                                            <xctk:IntegerUpDown x:Name="BedFirstLayer" Value="110" Increment="1" Maximum="150" Minimum="0"  Grid.Column="1" Grid.Row="2"/>
+
+                                            <Label Content="Bed - Other Layers :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="3"/>
+                                            <xctk:IntegerUpDown x:Name="BedOtherLayers" Value="110" Increment="1" Maximum="150" Minimum="0"  Grid.Column="1" Grid.Row="3"/>
+
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+
+
+                                <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
+                                    <GroupBox.Header>
+                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Skirt"/>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition   Width="1*"/>
+                                            <ColumnDefinition   Width="15*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                                <RowDefinition Height="1*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Content="Loops :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
+                                            <xctk:IntegerUpDown x:Name="Loops" Value="1" Increment="1" Maximum="5" Minimum="0"  Grid.Column="1" />
+
+                                            <Label Content="Distance from object :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="1"/>
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="1" Grid.Column="1">
+                                                <xctk:IntegerUpDown x:Name="DistanceFromObject" Value="6" Increment="1" Maximum="20" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label  Foreground="White" Content="mm" />
+                                            </StackPanel>
+
+
+                                            <Label Content="Skirt height :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="2"/>
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="2" Grid.Column="1">
+                                                <xctk:IntegerUpDown x:Name="SkirtHeight" Value="1" Increment="1" Maximum="10" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label  Foreground="White" Content="layers" />
+                                            </StackPanel>
+                                            <Label Content="Minimum extrusion length :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0" Grid.Row="3"/>
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="3" Grid.Column="1">
+                                                <xctk:IntegerUpDown x:Name="MinimumExtrusionLength" Value="0" Increment="1" Maximum="10" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label  Foreground="White" Content="mm" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+
+
+                                <GroupBox  BorderBrush="{x:Null}" Foreground="White" BorderThickness="0" Height="auto">
+                                    <GroupBox.Header>
+                                        <Label Foreground="White" FontSize="17" TextOptions.TextFormattingMode="Display" Content="Brim"/>
+                                    </GroupBox.Header>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition   Width="1*"/>
+                                            <ColumnDefinition   Width="15*"/>
+                                        </Grid.ColumnDefinitions>
+                                        <Grid Grid.Column="1">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="2.5*"/>
+                                                <ColumnDefinition Width="1.5*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition Height="1*"/>
+                                            </Grid.RowDefinitions>
+
+                                            <Label Content="Brim Width :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
+                                            <StackPanel Orientation="Horizontal"  Grid.Row="0" Grid.Column="1">
+                                                <xctk:IntegerUpDown x:Name="BrimWidth" Value="0" Increment="1" Maximum="20" Minimum="0"   HorizontalAlignment="Center" VerticalAlignment="Center" Width="50" />
+                                                <Label  Foreground="White" Content="mm" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Grid>
+                                </GroupBox>
+
+
+
+                            </StackPanel>
+
+                        </Expander>
+
 
                     </StackPanel>
                 </Grid>

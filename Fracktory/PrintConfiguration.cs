@@ -9,8 +9,9 @@ namespace Fracktory
     {
         ABS,PLA,OTHERS
     }
-    class PrintConfiguration
+    class PrintConfiguration 
     {
+        
         private PrintMaterial Material;
         public Dictionary<String, String> ExtraConfiguration = new Dictionary<string, string>();
         public PrintConfiguration(PrintMaterial Material)

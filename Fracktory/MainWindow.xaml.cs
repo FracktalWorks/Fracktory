@@ -1,22 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using WinInterop = System.Windows.Interop;
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
 using System.Windows.Media.Media3D;
-using HelixToolkit.Wpf;
 
 namespace Fracktory
 {
@@ -26,14 +14,17 @@ namespace Fracktory
     public partial class MainWindow : Window
     {
         public Model3D currentModel;
+        
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainViewModel(new FileDialogService(), Viewport);
+            this.DataContext = new MainViewModel(new FileDialogService(), Viewport,RotatorX,RotatorY,RotatorZ,ScaleXYZ);
             FracktoryWindow.Loaded += new RoutedEventHandler(win_Loaded);
             FracktoryWindow.SourceInitialized += new EventHandler(win_SourceInitialized);
+            
         }
 
+        #region others
 
         #region  size_details
         void win_SourceInitialized(object sender, EventArgs e)
@@ -355,10 +346,7 @@ namespace Fracktory
 
         }
 
-        private void ExpanderPrint_Expanded(object sender, RoutedEventArgs e)
-        {
-            ExpanderFilament.IsExpanded = false;
-        }
+      
 
         private void ExpanderFilament_Expanded(object sender, RoutedEventArgs e)
         {
@@ -375,34 +363,60 @@ namespace Fracktory
             TabPronterface.IsSelected = true;
         }
 
-        private void chkExpertMode_Click(object sender, RoutedEventArgs e)
+      
+#endregion
+
+        private void tglRotate_Click(object sender, RoutedEventArgs e)
         {
-            if (chkExpertMode.IsChecked==true)
+            //first time
+            if (RotatePanel.Visibility == Visibility.Collapsed && ScalePanel.Visibility == Visibility.Collapsed)
             {
-                ExpanderExpert.Visibility = Visibility.Visible;
+                RotatePanel.Visibility = Visibility.Visible;
             }
-            else
+            else if (RotatePanel.Visibility == Visibility.Collapsed && ScalePanel.Visibility == Visibility.Visible)
             {
-                ExpanderExpert.Visibility = Visibility.Collapsed;
+                RotatePanel.Visibility = Visibility.Visible;
+                ScalePanel.Visibility = Visibility.Collapsed;
+            }
+            else if (RotatePanel.Visibility == Visibility.Visible && ScalePanel.Visibility == Visibility.Collapsed)
+            {
+                RotatePanel.Visibility = Visibility.Collapsed;
+                ScalePanel.Visibility = Visibility.Collapsed;
             }
         }
 
-        private void btnLoad_Click(object sender, RoutedEventArgs e)
+        private void tglScale_Click(object sender, RoutedEventArgs e)
         {
-            //OpenFileDialog _ofd = new OpenFileDialog();
-            //_ofd.Filter = "Steriolithigraphical File (*.stl)|*.stl";
-            //_ofd.Title = "Open File";
-            //if (_ofd.ShowDialog() == true)
-            //{
-            //    var importer = new HelixToolkit.Wpf.ModelImporter();
-            //    var groupLoad = importer.Load("_ofd.FileName;");
-               
-            //    //CurrentModel = await this.LoadAsync(this.CurrentModelPath, false);
-            //}
+            //first time
+            if (RotatePanel.Visibility == Visibility.Collapsed && ScalePanel.Visibility == Visibility.Collapsed)
+            {
+                ScalePanel.Visibility = Visibility.Visible;
+            }
+            else if (RotatePanel.Visibility == Visibility.Collapsed && ScalePanel.Visibility == Visibility.Visible)
+            {
+                RotatePanel.Visibility = Visibility.Collapsed;
+                ScalePanel.Visibility = Visibility.Collapsed;
+            }
+            else if (RotatePanel.Visibility == Visibility.Visible && ScalePanel.Visibility == Visibility.Collapsed)
+            {
+                RotatePanel.Visibility = Visibility.Collapsed;
+                ScalePanel.Visibility = Visibility.Visible;
+            }
         }
+
+        private void btnPrint_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+    
+
+
 
 
     }
+
+
 
 
 }

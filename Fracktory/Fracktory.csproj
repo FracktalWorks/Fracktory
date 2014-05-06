@@ -102,6 +102,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BackgroundImages.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="FileDialogService.cs" />
     <Compile Include="IFileDialogService.cs" />
@@ -141,6 +142,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="Configuration\default.ini" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -193,6 +196,9 @@
     <Resource Include="image\scale icon.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="image\camera_reload.png" />
+    <Resource Include="image\load.png" />
+    <Resource Include="image\print.png" />
     <Content Include="Slic3r\cpfworkrt\libgcc_s_sjlj-1.dll" />
     <Content Include="Slic3r\cpfworkrt\libstdc++-6.dll" />
     <Content Include="Slic3r\cpfworkrt\perl514.dll" />
@@ -266,10 +272,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)Slic3r"  "$(TargetDir)Slic3r"  /s /e /i /c</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)Slic3r"  "$(TargetDir)Slic3r"  /s /e /i /c /y</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PreBuildEvent>del "$(TargetDir)Slic3r" /q</PreBuildEvent>
+    <PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

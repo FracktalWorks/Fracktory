@@ -27,7 +27,6 @@ namespace Fracktory
             get;
             set;
         }
-
         public Double X{get;set;}
         public Double Y
         {
@@ -40,6 +39,11 @@ namespace Fracktory
             set;
         }
         public Double Volume
+        {
+            get;
+            set;
+        }
+        public Double ScaleFactor
         {
             get;
             set;
@@ -59,33 +63,58 @@ namespace Fracktory
             get;
             set;
         }
+        public PrintConfiguration Config;
+
         public SlicerAdapter(String FileName)
         {
+            if (FileName == "")
+            {
+                return;
+            }
+            ScaleFactor = 1;
             this.FileName= FileName;
             Process p = new Process();
+            p.StartInfo.CreateNoWindow = true;
             p.StartInfo.WorkingDirectory = @"";
             p.StartInfo.FileName = AssemblyDirectory + @"\Slic3r\slic3r-console.exe";
             p.StartInfo.Arguments = "--info \"" + FileName + "\"";
             p.StartInfo.UseShellExecute = false;
+            
             p.StartInfo.RedirectStandardOutput = true;
             p.Start();
             string output = p.StandardOutput.ReadToEnd();
             p.WaitForExit();
+            while (output == "" || output.IndexOf("parts won't fit in your print") != -1)
+            {
+                if (ScaleFactor < 0.01)
+                {
+                    ScaleFactor -= 0.001;
+
+                }
+                else if (ScaleFactor<0.1)
+                {
+                    ScaleFactor -= 0.01;
+
+                }
+                else
+                {
+                    ScaleFactor -= 0.1;
+                }
+                p.StartInfo.Arguments = "--scale "+ ScaleFactor+" --info \"" + FileName + "\"";
+                p.Start();
+                output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+            }
             parseOutput(output);
-            Console.WriteLine("Output:");
-            Console.WriteLine(output);   
         }
 
-        //size:              x=92.951 y=93.426 z=26.120
-        //number of facets:  5546
-        //number of shells:  1
-        //volume:            22252.453
-        //needed repair:     no
+
         void parseOutput (string OutputText)
         {
             int indexS = 0;
             int indexE = 0;
 
+            #region findXYZ
             while (OutputText[indexS] != '=')
             {
                 indexS++;
@@ -121,33 +150,42 @@ namespace Fracktory
                 indexE++;
             }
             Z = Double.Parse(OutputText.Substring(indexS, indexE - indexS + 1));
+            #endregion
 
+            #region findRest
+            OutputText = OutputText.Substring(indexE);
+            indexS = indexE = 0;
+            indexS = OutputText.IndexOfAny(new char[]{'0','1','2','3','4','5','6','7','8','9'});
+            indexE = OutputText.IndexOf('\n');
+            NumberOfFacets = int.Parse(OutputText.Substring(indexS, indexE - indexS));
+
+            OutputText = OutputText.Substring(indexE+1);
+            indexS = indexE = 0;
+            indexS = OutputText.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
+            indexE = OutputText.IndexOf('\n');
+            NumberOfShells = int.Parse(OutputText.Substring(indexS, indexE - indexS));
+
+            OutputText = OutputText.Substring(indexE+1);
+            indexS = indexE = 0;
+            indexS = OutputText.IndexOfAny(new char[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' });
+            indexE = OutputText.IndexOf('\n');
+            Volume = double.Parse(OutputText.Substring(indexS, indexE - indexS));
+
+            OutputText = OutputText.Substring(indexE);
+            if (OutputText.IndexOf("no") > 0)
+            {
+                NeededRepair = false;
+            }
+            else
+            {
+                NeededRepair = true;
+            }
+
+
+            #endregion
         }
-        //check for errors
- 
-        //repair
 
 
-        //slice
 
     }
-
-public class RedirectingProcessOutput
-{
-    //public static void Main()
-    //{
-    //    Process p = new Process();
-    //    p.StartInfo.FileName = "cmd.exe";
-    //    p.StartInfo.Arguments = "/c dir *.cs";
-    //    p.StartInfo.UseShellExecute = false;
-    //    p.StartInfo.RedirectStandardOutput = true;
-    //    p.Start();
-
-    //    string output = p.StandardOutput.ReadToEnd();
-    //    p.WaitForExit();
-
-    //    Console.WriteLine("Output:");
-    //    Console.WriteLine(output);    
-    //}
-}
 }
