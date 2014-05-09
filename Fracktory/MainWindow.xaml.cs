@@ -5,7 +5,11 @@ using System.Windows.Media.Imaging;
 using WinInterop = System.Windows.Interop;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Media3D;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Reflection;
+using System.IO;
+using System.Collections.Generic;
 namespace Fracktory
 {
     /// <summary>
@@ -14,11 +18,12 @@ namespace Fracktory
     public partial class MainWindow : Window
     {
         public Model3D currentModel;
-        
+        public PrintConfiguration config;
+
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainViewModel(new FileDialogService(), Viewport,RotatorX,RotatorY,RotatorZ,ScaleXYZ);
+            this.DataContext = new MainViewModel(new FileDialogService(), Viewport,RotatorX,RotatorY,RotatorZ,ScaleXYZ,config);
             FracktoryWindow.Loaded += new RoutedEventHandler(win_Loaded);
             FracktoryWindow.SourceInitialized += new EventHandler(win_SourceInitialized);
             
@@ -346,12 +351,19 @@ namespace Fracktory
 
         }
 
-      
 
-        private void ExpanderFilament_Expanded(object sender, RoutedEventArgs e)
+
+        private void ExpanderExpert_Expanded(object sender, RoutedEventArgs e)
         {
             ExpanderPrint.IsExpanded = false;
         }
+
+
+        private void ExpanderPrint_Expanded(object sender, RoutedEventArgs e)
+        {
+            ExpanderExpert.IsExpanded = false;
+        }
+
 
         private void Slicer_tab_label_MouseUp(object sender, MouseButtonEventArgs e)
         {
@@ -406,12 +418,167 @@ namespace Fracktory
 
         private void btnPrint_Click(object sender, RoutedEventArgs e)
         {
+            if (FilamentType.SelectedIndex == 0)//abs
+            {
+                config = new PrintConfiguration(PrintMaterial.ABS);              
+            }
+            else if (FilamentType.SelectedIndex == 1)//pla
+            {
+                config = new PrintConfiguration(PrintMaterial.PLA);
+            }
+            else //other
+            {
+                config = new PrintConfiguration(PrintMaterial.ABS);
+                config.ExtraConfiguration["temperature"] = ExtruderOtherLayers.Value.ToString();
+                config.ExtraConfiguration["first-layer-temperature"] = ExtruderFirstLayer.Value.ToString();
+                config.ExtraConfiguration["bed-temperature"] = BedOtherLayers.Value.ToString();
+                config.ExtraConfiguration["first-layer-bed-temperature"] = BedFirstLayer.Value.ToString();
+                config.ExtraConfiguration["skirt-distance"] = DistanceFromObject.Value.ToString();
+                config.ExtraConfiguration["skirt-height"] = SkirtHeight.Value.ToString();
+                config.ExtraConfiguration["skirts"] = Loops.Value.ToString();
+                config.ExtraConfiguration["min-skirt-length"] = MinimumExtrusionLength.Value.ToString();
+                config.ExtraConfiguration["brim-width"] = BrimWidth.Value.ToString();
+            }
+
+            if ((bool) SpiralVase.IsChecked)
+            {
+                config.ExtraConfiguration["spiral-vase"] = "1";
+            }
+            else
+            {
+                config.ExtraConfiguration["spiral-vase"] = "0";
+            }
+
+            if (HeightResolution.SelectedIndex == 0)
+            {
+                config.ExtraConfiguration["layer-height"] = "0.1"; //low
+            }
+            else if (HeightResolution.SelectedIndex == 1)
+            {
+                config.ExtraConfiguration["layer-height"] = "0.2"; //med
+            }
+            else if (HeightResolution.SelectedIndex == 2)
+            {
+                config.ExtraConfiguration["layer-height"] = "0.3"; //high
+            }
+
+            //config.ExtraConfiguration["fill-density"] = "0.15";
+            if (FillDensity.SelectedIndex == 0)
+            {
+                config.ExtraConfiguration["fill-density"] = "0"; //hollow
+            }
+            else if (FillDensity.SelectedIndex == 1)
+            {
+                config.ExtraConfiguration["fill-density"] = "0.06"; //low
+            }
+            else if (FillDensity.SelectedIndex == 2)
+            {
+                config.ExtraConfiguration["fill-density"] = "0.15"; //medium
+            }
+            else if (FillDensity.SelectedIndex == 3)
+            {
+                config.ExtraConfiguration["fill-density"] = "0.4"; //medium
+            }
+            
+            config.ExtraConfiguration["infill-every-layers"] = CombineInfillEvery.Value.ToString();
+            if ((bool) OnlyInfillWhenNeeded.IsChecked)
+            {
+                config.ExtraConfiguration["infill-only-where-needed"] = "1";
+            }
+            else
+            {
+                config.ExtraConfiguration["infill-only-where-needed"] = "0";
+            }
+
+            config.ExtraConfiguration["solid-infill-every-layers"] = SolidInfillEvery.Value.ToString();
+            config.ExtraConfiguration["solid-infill-below-area"] = SolidInfillThresholdLevels.Value.ToString();
+
+            if ((bool) OnlyRetractWhenCrossingPerimeters.IsChecked)
+            {
+                config.ExtraConfiguration["only-retract-when-crossing-perimeters"] = "1";
+            }
+            else
+            {
+                config.ExtraConfiguration["only-retract-when-crossing-perimeters"] = "0";
+            }
+            if ((bool) GenerateSupportMaterial.IsChecked)
+            {
+                config.ExtraConfiguration["support-material"] = "1";
+            }
+            else
+            {
+                config.ExtraConfiguration["support-material"] = "0";
+            }
+
+            if ((bool) InfillBeforePerimeters.IsChecked)
+            {
+                config.ExtraConfiguration["infil-first"] = "1";
+            }
+            else
+            {
+                config.ExtraConfiguration["infill-first"] = "0";
+            }
+            ((MainViewModel) (this.DataContext)).PrintConfig=config;
 
         }
 
-    
+        private void FilamentType_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
+        {
+            if (ExtruderFirstLayer == null)
+            {
+                return;
+            }
+            if (FilamentType.SelectedIndex == 0)
+            {
+                ExpanderExpert.Visibility = Visibility.Collapsed;
+                updateEntries(@"\configuration\ABS.json");
 
+            }
+            else if (FilamentType.SelectedIndex == 1)
+            {
+                ExpanderExpert.Visibility = Visibility.Collapsed;
+                updateEntries(@"\configuration\PLA.json");
+            }
+            else
+            {
+                ExpanderExpert.Visibility = Visibility.Visible;
+                ExpanderExpert.IsExpanded = true;
+                ExpanderPrint.IsExpanded = false;
+            }
+        }
+        private void updateEntries(string jsonPath)
+        {
+            if (ExtruderFirstLayer == null)
+            {
+                return;
+            }
+            string path = System.IO.Path.Combine( AssemblyDirectory + jsonPath);
+            string configuration = System.IO.File.ReadAllText(path);
+            JObject JsonConfiguration = JObject.Parse(configuration);
+            ExtruderFirstLayer.Value = Convert.ToInt32(JsonConfiguration["ExtruderFirstLayer"].ToString());
+            ExtruderOtherLayers.Value = Convert.ToInt32(JsonConfiguration["ExtruderOtherLayers"].ToString());
 
+            BedFirstLayer.Value = Convert.ToInt32(JsonConfiguration["BedFirstLayer"].ToString());
+            BedOtherLayers.Value = Convert.ToInt32(JsonConfiguration["BedOtherLayers"].ToString());
+
+            Loops.Value = Convert.ToInt32(JsonConfiguration["Loops"].ToString());
+            DistanceFromObject.Value = Convert.ToInt32(JsonConfiguration["DistanceFromObject"].ToString());
+            SkirtHeight.Value = Convert.ToInt32(JsonConfiguration["SkirtHeight"].ToString());
+            MinimumExtrusionLength.Value = Convert.ToInt32(JsonConfiguration["MinimumExtrusionLength"].ToString());
+
+            BrimWidth.Value = Convert.ToInt32(JsonConfiguration["BrimWidth"].ToString());
+
+        }
+        static public string AssemblyDirectory
+        {
+            get
+            {
+                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                UriBuilder uri = new UriBuilder(codeBase);
+                string path = Uri.UnescapeDataString(uri.Path);
+                return Path.GetDirectoryName(path);
+            }
+        }
 
 
     }

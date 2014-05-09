@@ -58,6 +58,9 @@
       <HintPath>..\packages\HelixToolkit.Wpf.2014.2.13.1\lib\NET45\HelixToolkit.Wpf.SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Interactions" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.6.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationUI, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="ReachFramework" />
     <Reference Include="System" />
@@ -102,6 +105,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="AdmeshAdapter.cs" />
     <Compile Include="BackgroundImages.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="FileDialogService.cs" />
@@ -144,7 +148,9 @@
     </EmbeddedResource>
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
+    <None Include="Configuration\ABS.json" />
     <None Include="Configuration\default.ini" />
+    <None Include="Configuration\PLA.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -187,6 +193,7 @@
     <Resource Include="image\closeh.png" />
     <Resource Include="image\min.png" />
     <Resource Include="image\minh.png" />
+    <Resource Include="image\print.png" />
     <Resource Include="image\restore.png" />
     <Resource Include="image\restoreh.png" />
   </ItemGroup>
@@ -198,7 +205,8 @@
   <ItemGroup>
     <Resource Include="image\camera_reload.png" />
     <Resource Include="image\load.png" />
-    <Resource Include="image\print.png" />
+    <Resource Include="image\Reset.png" />
+    <SplashScreen Include="image\spash.jpg" />
     <Content Include="Slic3r\cpfworkrt\libgcc_s_sjlj-1.dll" />
     <Content Include="Slic3r\cpfworkrt\libstdc++-6.dll" />
     <Content Include="Slic3r\cpfworkrt\perl514.dll" />
@@ -272,7 +280,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(ProjectDir)Slic3r"  "$(TargetDir)Slic3r"  /s /e /i /c /y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(ProjectDir)Slic3r"  "$(TargetDir)Slic3r"  /s /e /i /c /y
+xcopy "$(ProjectDir)Configuration"  "$(TargetDir)Configuration"  /s /e /i /c /y</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

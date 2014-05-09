@@ -88,13 +88,15 @@
                                 <RowDefinition Height="1*"/>
                                 <RowDefinition Height="10*"/>
                             </Grid.RowDefinitions>
-                            <HelixToolkit:HelixViewport3D  ShowCoordinateSystem="True" Name="Viewport"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" Grid.Row="2">
+                            <Label  Grid.Row="2" Background="{x:Null}" Foreground="White" Opacity="0.27" FontSize="120" VerticalAlignment="Bottom" Content="Load Model" Visibility="{Binding ModelNotLoaded}"/>
+
+                            <HelixToolkit:HelixViewport3D  ShowCoordinateSystem="True" x:Name="Viewport"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" Grid.Row="2" Visibility="{Binding ModelLoaded}">
 
                                 <HelixToolkit:HelixViewport3D.DefaultCamera>
                                     <PerspectiveCamera Position="0,-200,100" LookDirection="0,200,-100" UpDirection="0,0,1" FieldOfView="60" NearPlaneDistance=".001" />
                                 </HelixToolkit:HelixViewport3D.DefaultCamera>
 
-                                <ModelVisual3D Content="{Binding CurrentModel}"  x:Name="model1" >
+                                <ModelVisual3D Content="{Binding CurrentModel}"  x:Name="model1">
                                     <ModelVisual3D.Transform>
                                         <Transform3DGroup>
                                             <RotateTransform3D>
@@ -136,32 +138,37 @@
                                 </ModelVisual3D>
 
                             </HelixToolkit:HelixViewport3D>
+
                             <Grid Grid.Row="0" Background="#FF38342F">
-                                
-                                    <StackPanel Orientation="Horizontal">
-                                    <Button Name="btnLoad"  Command="{Binding FileOpenCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  Margin="10,0,0,0">
+
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="btnLoad"  Command="{Binding FileOpenCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  Margin="10,0,0,0">
                                         <Image Source="image/load.png"/>
                                     </Button>
-                                    <Button  Name="tglRotate" Command="{Binding ViewRotateCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="tglRotate_Click" IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0">
-                                            <Image Source="image/rotate icon.png" />
-                                        </Button>
-                                    <Button Name="tglScale" Command="{Binding ViewScaleCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="tglScale_Click"  IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0">
-                                            <Image Source="image/scale icon.png"/>
-                                        </Button>
-                                    <Button   Background="{x:Null}"  Command="{Binding ViewZoomExtentsCommand}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0">
+                                    <Button  x:Name="tglRotate" Command="{Binding ViewRotateCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="tglRotate_Click" Visibility="{Binding ModelLoaded}" Margin="10,0,0,0">
+                                        <Image Source="image/rotate icon.png" />
+                                    </Button>
+                                    <Button x:Name="tglScale" Command="{Binding ViewScaleCommand}" Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Click="tglScale_Click"  Visibility="{Binding ModelLoaded}" Margin="10,0,0,0">
+                                        <Image Source="image/scale icon.png"/>
+                                    </Button>
+                                    <Button   Background="{x:Null}"  Command="{Binding ViewZoomExtentsCommand}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  Visibility="{Binding ModelLoaded}" Margin="10,0,0,0">
                                         <Image Source="image/camera_reload.png"/>
                                     </Button>
 
-                                    <Button  Content="Reset Solid" Background="{x:Null}"  Command="{Binding ResetSolidCommand}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  IsEnabled="{Binding ModelLoaded}"  Margin="10,0,0,0"/>
+                                    <Button   Background="{x:Null}"  Command="{Binding ResetSolidCommand}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  Visibility="{Binding ModelLoaded}"  Margin="10,0,0,0">
+                                        <Image Source="image/Reset.png" Stretch="UniformToFill" />
+                                    </Button>
 
-                                    <Button Background="{x:Null}" Foreground="White" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right"  IsEnabled="{Binding ModelLoaded}" Margin="10,0,0,0" x:Name="btnPrint" Click="btnPrint_Click">
+                                    <Button Background="{x:Null}" Foreground="White" Command="{Binding PrintCommand}" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" HorizontalAlignment="Right"  Visibility="{Binding ModelLoaded}" Margin="10,0,0,0" x:Name="btnPrint" Click="btnPrint_Click">
+
                                         <Image Source="image/print.png" />
+
                                     </Button>
                                 </StackPanel>
 
-                                
+
                             </Grid>
-                            
+
                             <!-- scale pane -->
 
                             <Grid Grid.Row="1" x:Name="ScalePanel" Visibility="Collapsed">
@@ -170,30 +177,30 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="*" />
                                 </Grid.ColumnDefinitions>
-                                
+
                                 <StackPanel Background="#FF38342F">
-                                    <TextBlock FontSize="48"   Opacity="0.2">Scale</TextBlock>
+                                    <TextBlock FontSize="48"   Opacity="0.2"><Run Text="Scale"/></TextBlock>
                                 </StackPanel>
                                 <StackPanel Background="#FF38342F" Grid.Column="1" Grid.ColumnSpan="2">
-                                    <Slider  Minimum="0" Maximum="500" Value="{Binding ElementName=ScaleXYZ, Path=Value}" Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
+                                    <Slider  Minimum="0" Maximum="500" Value="{Binding Value, ElementName=ScaleXYZ}" Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
                                             <ColumnDefinition Width="*"/>
                                         </Grid.ColumnDefinitions>
-                                    
-                                        
-                                    <StackPanel Orientation="Horizontal" Grid.Column="0">
-                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeX, StringFormat={}{0:#.00} x }" />
-                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeY, StringFormat={}{0:#.00} x }" />
-                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeZ, StringFormat={}{0:#.00} }" />
+
+
+                                        <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeX, StringFormat=\{0:#.00\} x}" />
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeY, StringFormat=\{0:#.00\} x}" />
+                                            <TextBlock FontSize="20"  Opacity="0.2"  Text="{Binding SizeZ, StringFormat=\{0:#.00\}}" />
                                             <!--Binding ElementName=RBounds,Path=SizeX-->
                                         </StackPanel>
 
-                                        <TextBlock FontSize="20" Grid.Column="1" HorizontalAlignment="Right"  Opacity="0.2" Text="{Binding StringFormat={}{0:#.00}%,ElementName=ScaleXYZ, Path=Value}"/>
+                                        <TextBlock FontSize="20" Grid.Column="1" HorizontalAlignment="Right"  Opacity="0.2" Text="{Binding Value, ElementName=ScaleXYZ, StringFormat=\{0:#.00\}%}"/>
                                     </Grid>
                                 </StackPanel>
-                                    
+
                             </Grid>
                             <Grid Grid.Row="1" x:Name="RotatePanel" Visibility="Collapsed">
                                 <Grid.ColumnDefinitions>
@@ -204,7 +211,7 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Background="#FF38342F">
-                                    <TextBlock FontSize="48"   Opacity="0.2">Rotate</TextBlock>
+                                    <TextBlock FontSize="48"   Opacity="0.2"><Run Text="Rotate"/></TextBlock>
                                 </StackPanel>
                                 <StackPanel Background="#FF38342F" Grid.Column="1" Grid.ColumnSpan="1">
                                     <Slider  Minimum="-90" Maximum="90" Value="{Binding RotateX}"  Foreground="#FF38342F" Background="#FF38342F" Opacity="0.7"/>
@@ -219,7 +226,7 @@
                                             <TextBlock FontSize="20"  Opacity="0.2"  Text="X" />
                                         </StackPanel>
 
-                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateX, StringFormat={}{0:0.0°}}" />
+                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateX, StringFormat=\{0:0.0°\}}" />
                                     </Grid>
                                 </StackPanel>
                                 <StackPanel Background="#FF38342F" Grid.Column="2" Grid.ColumnSpan="1">
@@ -235,7 +242,7 @@
                                             <TextBlock FontSize="20"  Opacity="0.2"  Text="Y" />
                                         </StackPanel>
 
-                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateY, StringFormat={}{0:0.0°}}" />
+                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateY, StringFormat=\{0:0.0°\}}" />
                                     </Grid>
                                 </StackPanel>
                                 <StackPanel Background="#FF38342F" Grid.Column="3" Grid.ColumnSpan="1">
@@ -251,7 +258,7 @@
                                             <TextBlock FontSize="20"  Opacity="0.2"  Text="Z" />
                                         </StackPanel>
 
-                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateZ, StringFormat={}{0:0.0°}}" />
+                                        <TextBlock FontSize="20"  Grid.Column="1" Opacity="0.2" HorizontalAlignment="Right"  Text="{Binding RotateZ, StringFormat=\{0:0.0°\}}" />
                                     </Grid>
                                 </StackPanel>
                             </Grid>
@@ -283,7 +290,7 @@
                                             </Grid.RowDefinitions>
 
                                             <Label Content="Filament Type :" HorizontalAlignment="Left" Foreground="White" Grid.Column="0"/>
-                                            <ComboBox x:Name="FilamentType" Width="auto" SelectedIndex="0"  Grid.Column="1">
+                                            <ComboBox x:Name="FilamentType" Width="auto" SelectedIndex="0"  Grid.Column="1" SelectionChanged="FilamentType_SelectionChanged">
                                                 <ComboBoxItem Content="ABS" />
                                                 <ComboBoxItem Content="PLA"/>
                                                 <ComboBoxItem Content="Other..."/>
@@ -299,7 +306,7 @@
                         <!--</Expander>-->
 
                         
-                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderPrint">
+                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderPrint" Expanded="ExpanderPrint_Expanded">
                             <Expander.Header>
                                 <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="PRINT SETTINGS"/>
                             </Expander.Header>
@@ -418,7 +425,7 @@
                                 </GroupBox>
                             </StackPanel>
                         </Expander>
-                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderExpert" Expanded="ExpanderFilament_Expanded" UseLayoutRounding="False" Visibility="Visible">
+                        <Expander Foreground="White"  Background="#FF38342F" FontFamily="Raleway" FontSize="12" TextOptions.TextFormattingMode="Display" FontWeight="Medium" IsExpanded="False" x:Name="ExpanderExpert" Expanded="ExpanderExpert_Expanded" UseLayoutRounding="False" Visibility="Collapsed">
                             <Expander.Header>
                                 <Label Foreground="White" FontSize="17" Width="auto" Cursor="Hand" Content="EXPERT SETTINGS"/>
                             </Expander.Header>

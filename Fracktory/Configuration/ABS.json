@@ -1,0 +1,11 @@
+{
+"ExtruderFirstLayer":"240",
+"ExtruderOtherLayers":"240",
+"BedFirstLayer":"120",
+"BedOtherLayers":"120",
+"Loops":"1",
+"DistanceFromObject":"6",
+"SkirtHeight":"1",
+"MinimumExtrusionLength":"0",
+"BrimWidth":"0"
+}

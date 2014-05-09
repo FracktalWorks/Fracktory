@@ -21,99 +21,28 @@ namespace Fracktory
     public class MainViewModel : Observable
     {
         private const string OpenFileFilter = "3D model files (*.3ds;*.obj;*.lwo;*.stl)|*.3ds;*.obj;*.objz;*.lwo;*.stl";
-
         private const string TitleFormatString = "3D model viewer - {0}";
-
         private readonly IFileDialogService fileDialogService;
-
         private readonly IHelixViewport3D viewport;
-
         private readonly Dispatcher dispatcher;
-
         private string currentModelPath;
-
         private string applicationTitle;
-
         private double expansion;
-        private PrintConfiguration configuration;
+        private PrintConfiguration printConfig;
         private Model3D currentModel;
         private double scaleFactor;
         private double originalScaleFactor;
-
+         private RotateManipulator rotatorManipulatorX;
+        private RotateManipulator rotatorManipulatorY;
+        private RotateManipulator rotatorManipulatorZ;
+        private TranslateManipulator ScaleXYZ;
         private double sizeX;
         private double sizeY;
         private double sizeZ;
-        private Boolean modelLoaded;
-        public Boolean ModelLoaded
-        {
-            get
-            {
-                return modelLoaded;
-            }
-            set
-            {
-                modelLoaded = value;
-                RaisePropertyChanged("ModelLoaded");
-            }
-        }
+        private Visibility modelLoaded;
+        private Visibility modelNotLoaded;
+        public SlicerAdapter adp;
 
-        public double ScaleFactor
-        {
-            get
-            {
-                return this.scaleFactor;
-            }
-            set
-            {
-
-
-                if (CurrentModel != null)
-                {
-
-                    CurrentModel.Transform = new System.Windows.Media.Media3D.ScaleTransform3D(value / 100, value / 100, value / 100);
-                    if (CurrentModel.Bounds.SizeX > 200 || CurrentModel.Bounds.SizeY > 200 || CurrentModel.Bounds.SizeZ > 200 || value < 0)
-                    {
-                        CurrentModel.Transform = new System.Windows.Media.Media3D.ScaleTransform3D(scaleFactor / 100, scaleFactor / 100, scaleFactor / 100);
-
-                        ScaleXYZ.Position = new Point3D(0, 0, 0);
-                    }
-                    else
-                    {
-                        this.scaleFactor = value;
-                        this.RaisePropertyChanged("ScaleFactor");
-                        SizeX = CurrentModel.Bounds.SizeX;
-                        SizeY = CurrentModel.Bounds.SizeY;
-                        SizeZ = CurrentModel.Bounds.SizeZ;
-
-
-                        //RaisePropertyChanged("SizeX");
-                        ScaleXYZ.Length = currentModel.Bounds.SizeZ + 30;
-                        if (ScaleXYZ.Visibility==Visibility.Visible)
-                        {
-                            ScaleXYZ.Position = new Point3D(0, 0, 0);
-
-                        }
-
-
-                    }
-                }
-            }
-        }
-
-        public double OriginalScaleFactor
-        {
-            get
-            {
-                return this.originalScaleFactor;
-            }
-            set
-            {
-                if (CurrentModel != null)
-                {
-                    originalScaleFactor = value;
-                }
-            }
-        }
         private double rotateX;
         public double RotateX
         {
@@ -179,57 +108,87 @@ namespace Fracktory
                 RaisePropertyChanged("RotateZ");
             }
         }
-
-        private RotateManipulator rotatorManipulatorX;
-        private RotateManipulator rotatorManipulatorY;
-        private RotateManipulator rotatorManipulatorZ;
-        private TranslateManipulator ScaleXYZ;
-
-
-
-        public MainViewModel(IFileDialogService fds, HelixViewport3D viewport, RotateManipulator rmX, RotateManipulator rmY, RotateManipulator rmZ, TranslateManipulator scaleXYZ)
+        public Visibility ModelNotLoaded
         {
-            if (viewport == null)
+            get
             {
-                throw new ArgumentNullException("viewport");
+                return modelNotLoaded;
             }
-           // configuration = conf;
-            ScaleFactor = 100;
-            SizeX = SizeY = SizeZ = 0;
-            this.rotatorManipulatorX = rmX;
-            this.rotatorManipulatorY = rmY;
-            this.rotatorManipulatorZ = rmZ;
-            this.ScaleXYZ = scaleXYZ;
-            this.dispatcher = Dispatcher.CurrentDispatcher;
-            this.Expansion = 1;
-            this.fileDialogService = fds;
-            this.viewport = viewport;
-            this.FileOpenCommand = new DelegateCommand(this.FileOpen);
-            this.FileExportCommand = new DelegateCommand(this.FileExport);
-            this.FileExitCommand = new DelegateCommand(FileExit);
-            this.ViewZoomExtentsCommand = new DelegateCommand(this.ViewZoomExtents);
-            this.EditCopyXamlCommand = new DelegateCommand(this.CopyXaml);
-            this.ViewRotateCommand = new DelegateCommand(this.ViewRotate);
-            this.ViewScaleCommand = new DelegateCommand(this.ViewScale);
-            this.ResetSolidCommand = new DelegateCommand(this.ResetSolid);
-            this.ApplicationTitle = "Fracktory";
-            this.Elements = new List<VisualViewModel>();
-            foreach (var c in viewport.Children)
+            set
             {
-                this.Elements.Add(new VisualViewModel(c));
+                modelNotLoaded = value;
+                RaisePropertyChanged("ModelNotLoaded");
+            }
+        }
+        public Visibility ModelLoaded
+        {
+            get
+            {
+                return modelLoaded;
+            }
+            set
+            {
+                modelLoaded = value;
+                RaisePropertyChanged("ModelLoaded");
             }
         }
 
-        private void ResetSolid()
+        public double ScaleFactor
         {
-            if (CurrentModel != null)
+            get
             {
-                ScaleFactor = OriginalScaleFactor;
-                RotateX = RotateY = RotateZ = 0;
+                return this.scaleFactor;
+            }
+            set
+            {
 
+
+                if (CurrentModel != null)
+                {
+
+                    CurrentModel.Transform = new System.Windows.Media.Media3D.ScaleTransform3D(value / 100, value / 100, value / 100);
+                    if (CurrentModel.Bounds.SizeX > 200 || CurrentModel.Bounds.SizeY > 200 || CurrentModel.Bounds.SizeZ > 200 || value < 0)
+                    {
+                        CurrentModel.Transform = new System.Windows.Media.Media3D.ScaleTransform3D(scaleFactor / 100, scaleFactor / 100, scaleFactor / 100);
+
+                        ScaleXYZ.Position = new Point3D(0, 0, 0);
+                    }
+                    else
+                    {
+                        this.scaleFactor = value;
+                        this.RaisePropertyChanged("ScaleFactor");
+                        SizeX = CurrentModel.Bounds.SizeX;
+                        SizeY = CurrentModel.Bounds.SizeY;
+                        SizeZ = CurrentModel.Bounds.SizeZ;
+
+
+                        //RaisePropertyChanged("SizeX");
+                        ScaleXYZ.Length = currentModel.Bounds.SizeZ + 30;
+                        if (ScaleXYZ.Visibility == Visibility.Visible)
+                        {
+                            ScaleXYZ.Position = new Point3D(0, 0, 0);
+
+                        }
+
+
+                    }
+                }
             }
         }
-
+        public double OriginalScaleFactor
+        {
+            get
+            {
+                return this.originalScaleFactor;
+            }
+            set
+            {
+                if (CurrentModel != null)
+                {
+                    originalScaleFactor = value;
+                }
+            }
+        }
         public double SizeX
         {
             get
@@ -242,7 +201,6 @@ namespace Fracktory
                 RaisePropertyChanged("SizeX");
             }
         }
-
         public double SizeY
         {
             get
@@ -255,7 +213,6 @@ namespace Fracktory
                 RaisePropertyChanged("SizeY");
             }
         }
-
         public double SizeZ
         {
             get
@@ -282,7 +239,6 @@ namespace Fracktory
                 this.RaisePropertyChanged("CurrentModelPath");
             }
         }
-
         public string ApplicationTitle
         {
             get
@@ -296,13 +252,11 @@ namespace Fracktory
                 this.RaisePropertyChanged("ApplicationTitle");
             }
         }
-
         public List<VisualViewModel> Elements
         {
             get;
             set;
         }
-
         public double Expansion
         {
             get
@@ -317,6 +271,18 @@ namespace Fracktory
                     this.expansion = value;
                     this.RaisePropertyChanged("Expansion");
                 }
+            }
+        }
+        public PrintConfiguration PrintConfig
+        {
+            get
+            {
+                return printConfig;
+            }
+            set
+            {
+                printConfig = value;
+                this.RaisePropertyChanged("PrintConfig");
             }
         }
 
@@ -338,37 +304,31 @@ namespace Fracktory
 
             }
         }
-
         public ICommand FileOpenCommand
         {
             get;
             set;
         }
-
         public ICommand FileExportCommand
         {
             get;
             set;
         }
-
         public ICommand FileExitCommand
         {
             get;
             set;
         }
-
         public ICommand HelpAboutCommand
         {
             get;
             set;
         }
-
         public ICommand ViewZoomExtentsCommand
         {
             get;
             set;
         }
-
         public ICommand EditCopyXamlCommand
         {
             get;
@@ -389,12 +349,62 @@ namespace Fracktory
             get;
             set;
         }
+        public ICommand PrintCommand
+        {
+            get;
+            set;
+        }
+
+        public MainViewModel(IFileDialogService fds, HelixViewport3D viewport, RotateManipulator rmX, RotateManipulator rmY, RotateManipulator rmZ, TranslateManipulator scaleXYZ, PrintConfiguration PrintConfig)
+        {
+            if (viewport == null)
+            {
+                throw new ArgumentNullException("viewport");
+            }
+            this.printConfig = PrintConfig;
+            ScaleFactor = 100;
+            SizeX = SizeY = SizeZ = 0;
+            this.rotatorManipulatorX = rmX;
+            this.rotatorManipulatorY = rmY;
+            this.rotatorManipulatorZ = rmZ;
+            this.ScaleXYZ = scaleXYZ;
+            this.dispatcher = Dispatcher.CurrentDispatcher;
+            this.Expansion = 1;
+            this.fileDialogService = fds;
+            this.viewport = viewport;
+            this.FileOpenCommand = new DelegateCommand(this.FileOpen);
+            this.FileExportCommand = new DelegateCommand(this.FileExport);
+            this.FileExitCommand = new DelegateCommand(FileExit);
+            this.ViewZoomExtentsCommand = new DelegateCommand(this.ViewZoomExtents);
+            this.EditCopyXamlCommand = new DelegateCommand(this.CopyXaml);
+            this.ViewRotateCommand = new DelegateCommand(this.ViewRotate);
+            this.ViewScaleCommand = new DelegateCommand(this.ViewScale);
+            this.ResetSolidCommand = new DelegateCommand(this.ResetSolid);
+            this.PrintCommand = new DelegateCommand(this.Print);
+            this.ApplicationTitle = "Fracktory";
+            ModelLoaded = Visibility.Collapsed;
+            ModelNotLoaded = Visibility.Visible;
+            this.Elements = new List<VisualViewModel>();
+
+            foreach (var c in viewport.Children)
+            {
+                this.Elements.Add(new VisualViewModel(c));
+            }
+        }
 
         private static void FileExit()
         {
             Application.Current.Shutdown();
         }
+        private void ResetSolid()
+        {
+            if (CurrentModel != null)
+            {
+                ScaleFactor = OriginalScaleFactor;
+                RotateX = RotateY = RotateZ = 0;
 
+            }
+        }
         private void FileExport()
         {
             var path = this.fileDialogService.SaveFileDialog(null, null, Exporters.Filter, ".png");
@@ -405,13 +415,11 @@ namespace Fracktory
 
             this.viewport.Export(path);
         }
-
         private void CopyXaml()
         {
             var rd = XamlExporter.WrapInResourceDictionary(this.CurrentModel);
             Clipboard.SetText(XamlHelper.GetXaml(rd));
         }
-
         private void ViewZoomExtents()
         {
             this.viewport.Camera.Position = new Point3D
@@ -431,7 +439,6 @@ namespace Fracktory
             viewport.CameraController.CameraRotationMode = CameraRotationMode.Turntable;
             viewport.CameraController.CameraMode = CameraMode.Inspect;
         }
-
         private void ViewRotate()
         {
 
@@ -487,7 +494,21 @@ namespace Fracktory
                 ScaleXYZ.Visibility = Visibility.Collapsed;
             }
         }
-
+        private void Print()
+        {
+            adp.Config = PrintConfig;
+            PrintConfig.ExtraConfiguration["scale"] = ScaleFactor.ToString();
+            if (RotateX == 0 && RotateY == 0 && RotateZ == 0)
+            {
+                adp.GenerateGcode();
+            }
+            else
+            {
+                AdmeshAdapter.Rotate(CurrentModelPath, RotateX, RotateY, RotateZ);
+                CurrentModelPath = CurrentModelPath.Substring(0, CurrentModelPath.IndexOf('.')) + "_rotated.stl";
+                adp.GenerateGcode();
+            }
+        }
         private async void FileOpen()
         {
             string path = this.fileDialogService.OpenFileDialog("models", null, OpenFileFilter, ".3ds");
@@ -505,7 +526,7 @@ namespace Fracktory
 
             this.CurrentModelPath = path;
 
-            SlicerAdapter adp = new SlicerAdapter(currentModelPath);
+            adp = new SlicerAdapter(currentModelPath);
 
             this.CurrentModel = await this.LoadAsync(this.CurrentModelPath, false);
             this.ApplicationTitle = string.Format(TitleFormatString, this.CurrentModelPath);
@@ -513,9 +534,10 @@ namespace Fracktory
             currentModel.Transform = new System.Windows.Media.Media3D.TranslateTransform3D(0, 0, -currentModel.Bounds.Z);
             ScaleFactor = adp.ScaleFactor * 100;
             OriginalScaleFactor = ScaleFactor;
-            ModelLoaded = true;
-        }
+            ModelLoaded = Visibility.Visible;
+            ModelNotLoaded = Visibility.Collapsed;
 
+        }
         private async Task<Model3DGroup> LoadAsync(string model3DPath, bool freeze)
         {
             return await Task.Factory.StartNew(() =>

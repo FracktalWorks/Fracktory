@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Fracktory
 {
-    class SlicerAdapter
+    public class SlicerAdapter
     {
 
         static public string AssemblyDirectory
@@ -185,7 +185,27 @@ namespace Fracktory
             #endregion
         }
 
-
+        public void GenerateGcode()
+        {
+            if (FileName == "" || Config == null)
+            {
+                return;
+            }
+            else
+            {
+                Process p = new Process();
+                p.StartInfo.CreateNoWindow = true;
+                p.StartInfo.WorkingDirectory = @"";
+                p.StartInfo.FileName = AssemblyDirectory + @"\Slic3r\slic3r-console.exe";
+                p.StartInfo.Arguments = "--load \"" + AssemblyDirectory+@"\Configuration\default.ini" + "\"" + " " +Config.generateExtraConfigurationString() + " \""+FileName +"\"";
+                p.StartInfo.UseShellExecute = false;
+                p.StartInfo.RedirectStandardOutput = true;
+                p.Start();
+                string output = p.StandardOutput.ReadToEnd();
+                p.WaitForExit();
+               
+            }
+        }
 
     }
 }

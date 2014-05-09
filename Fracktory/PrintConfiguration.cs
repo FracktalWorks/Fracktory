@@ -5,11 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 namespace Fracktory
 {
-    enum PrintMaterial
+    public enum PrintMaterial
     {
         ABS,PLA,OTHERS
     }
-    class PrintConfiguration 
+    public class PrintConfiguration 
     {
         
         private PrintMaterial Material;
@@ -29,10 +29,10 @@ namespace Fracktory
             ExtraConfiguration["solid-infill-below-area"] = "70";
             ExtraConfiguration["only-retract-when-crossing-perimeters"] = "1";
             ExtraConfiguration["support-material"] = "0";
-            
+            ExtraConfiguration["infill-first"] = "0";
             //Geometric
-            ExtraConfiguration["rotate"] = "0";
-            ExtraConfiguration["scale"] = "1";
+            //ExtraConfiguration["rotate"] = "0";
+            //ExtraConfiguration["scale"] = "1";
 
             if (Material == PrintMaterial.ABS)
             {
@@ -64,7 +64,23 @@ namespace Fracktory
         {
             string param = "";
             foreach (KeyValuePair<String, String> item in ExtraConfiguration)
-                param += " --" + item.Key + " " + item.Value;
+            {
+                if (" spiral-vase infill-only-where-needed support-material only-retract-when-crossing-perimeters infill-first ".IndexOf(" "+item.Key+" ") == -1)
+                {
+                    param += " --" + item.Key + " " + item.Value;
+                }
+                else
+                {
+                    if (item.Value == "0")
+                    {
+                        param += " --no-" + item.Key;
+                    }
+                    else
+                    {
+                        param += " --"+ item.Key;
+                    }
+                }
+            }
             return param;
         }
 
