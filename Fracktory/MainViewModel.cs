@@ -9,12 +9,12 @@ namespace Fracktory
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Media.Media3D;
     using System.Windows.Threading;
-
     using HelixToolkit.Wpf;
 
     //[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -26,13 +26,16 @@ namespace Fracktory
         private readonly IHelixViewport3D viewport;
         private readonly Dispatcher dispatcher;
         private string currentModelPath;
+        private string currentGcodePath;
         private string applicationTitle;
+        private string progressString;
+        private int progressValue;
         private double expansion;
         private PrintConfiguration printConfig;
         private Model3D currentModel;
         private double scaleFactor;
         private double originalScaleFactor;
-         private RotateManipulator rotatorManipulatorX;
+        private RotateManipulator rotatorManipulatorX;
         private RotateManipulator rotatorManipulatorY;
         private RotateManipulator rotatorManipulatorZ;
         private TranslateManipulator ScaleXYZ;
@@ -41,7 +44,22 @@ namespace Fracktory
         private double sizeZ;
         private Visibility modelLoaded;
         private Visibility modelNotLoaded;
+        private Visibility modelPrint;
+        private Visibility modelPrintDone;
         public SlicerAdapter adp;
+        private Model3D currentMesh;
+        public Model3D CurrentMesh
+        {
+            get
+            {
+                return currentMesh;
+            }
+            set
+            {
+                currentMesh = value;
+                RaisePropertyChanged("CurrentMesh");
+            }
+        }
 
         private double rotateX;
         public double RotateX
@@ -54,7 +72,7 @@ namespace Fracktory
             {
                 if (value <= 90 && value >= -90)
                 {
-                    rotateX = value;
+                    rotateX = ((int)(value/15)*15);
                 }
 
                 if (CurrentModel != null)
@@ -76,7 +94,7 @@ namespace Fracktory
             {
                 if (value <= 90 && value >= -90)
                 {
-                    rotateY = value;
+                    rotateY = ((int) (value / 15) * 15);
                 }
                 if (CurrentModel != null)
                 {
@@ -98,7 +116,7 @@ namespace Fracktory
             {
                 if (value <= 90 && value >= -90)
                 {
-                    rotateZ = value;
+                    rotateZ = ((int) (value / 15) * 15);
                 }
                 if (CurrentModel != null)
                 {
@@ -130,6 +148,30 @@ namespace Fracktory
             {
                 modelLoaded = value;
                 RaisePropertyChanged("ModelLoaded");
+            }
+        }
+        public Visibility ModelPrint
+        {
+            get
+            {
+                return modelPrint;
+            }
+            set
+            {
+                modelPrint = value;
+                RaisePropertyChanged("ModelPrint");
+            }
+        }
+        public Visibility ModelPrintDone
+        {
+            get
+            {
+                return modelPrintDone;
+            }
+            set
+            {
+                modelPrintDone = value;
+                RaisePropertyChanged("ModelPrintDone");
             }
         }
 
@@ -252,6 +294,44 @@ namespace Fracktory
                 this.RaisePropertyChanged("ApplicationTitle");
             }
         }
+        public string ProgressString
+        {
+            get
+            {
+                return progressString;
+            }
+            set
+            {
+                progressString = value;
+                RaisePropertyChanged("ProgressString");
+            }
+        }
+        public int ProgressValue
+        {
+            get
+            {
+                return progressValue;
+            }
+            set
+            {
+                progressValue = value;
+                RaisePropertyChanged("ProgressValue");
+            }
+        }
+        public string CurrentGcodePath
+        {
+            get
+            {
+                return this.currentGcodePath;
+            }
+
+            set
+            {
+                this.currentGcodePath = value;
+                this.RaisePropertyChanged("CurrentGcodePath");
+            }
+        }
+
         public List<VisualViewModel> Elements
         {
             get;
@@ -354,6 +434,17 @@ namespace Fracktory
             get;
             set;
         }
+        public ICommand PronterfaceCommand
+        {
+            get;
+            set;
+        }
+        public ICommand AbortCommand
+        {
+            get;
+            set;
+        }
+
 
         public MainViewModel(IFileDialogService fds, HelixViewport3D viewport, RotateManipulator rmX, RotateManipulator rmY, RotateManipulator rmZ, TranslateManipulator scaleXYZ, PrintConfiguration PrintConfig)
         {
@@ -361,6 +452,7 @@ namespace Fracktory
             {
                 throw new ArgumentNullException("viewport");
             }
+            
             this.printConfig = PrintConfig;
             ScaleFactor = 100;
             SizeX = SizeY = SizeZ = 0;
@@ -380,10 +472,14 @@ namespace Fracktory
             this.ViewRotateCommand = new DelegateCommand(this.ViewRotate);
             this.ViewScaleCommand = new DelegateCommand(this.ViewScale);
             this.ResetSolidCommand = new DelegateCommand(this.ResetSolid);
-            this.PrintCommand = new DelegateCommand(this.Print);
+            this.PrintCommand = new DelegateCommand(this.GenerateGCODE);
+            this.PronterfaceCommand = new DelegateCommand(this.Prontercae);
+            this.AbortCommand = new DelegateCommand(this.Abort);
             this.ApplicationTitle = "Fracktory";
             ModelLoaded = Visibility.Collapsed;
             ModelNotLoaded = Visibility.Visible;
+            ModelPrint = Visibility.Collapsed;
+            ModelPrintDone = Visibility.Collapsed;
             this.Elements = new List<VisualViewModel>();
 
             foreach (var c in viewport.Children)
@@ -494,20 +590,153 @@ namespace Fracktory
                 ScaleXYZ.Visibility = Visibility.Collapsed;
             }
         }
-        private void Print()
+        private void GenerateGCODE()
         {
+            rotatorManipulatorX.Visibility = Visibility.Collapsed;
+            rotatorManipulatorY.Visibility = Visibility.Collapsed;
+            rotatorManipulatorZ.Visibility = Visibility.Collapsed;
+            ScaleXYZ.Visibility = Visibility.Collapsed;
+
+            adp.HasFinished = false;
+            ModelPrint = Visibility.Visible;
+            ProgressString = adp.ProgressOutput = "";
+            ProgressValue = adp.ProgressValue = 0;
+            AllowUIToUpdate();
+
             adp.Config = PrintConfig;
-            PrintConfig.ExtraConfiguration["scale"] = ScaleFactor.ToString();
+            PrintConfig.ExtraConfiguration["scale"] = (ScaleFactor / 100).ToString();
             if (RotateX == 0 && RotateY == 0 && RotateZ == 0)
             {
-                adp.GenerateGcode();
             }
             else
             {
                 AdmeshAdapter.Rotate(CurrentModelPath, RotateX, RotateY, RotateZ);
                 CurrentModelPath = CurrentModelPath.Substring(0, CurrentModelPath.IndexOf('.')) + "_rotated.stl";
-                adp.GenerateGcode();
             }
+
+
+
+            ThreadPool.QueueUserWorkItem((state) =>
+               {
+                   Thread.Sleep(200);
+                   while (adp.HasFinished == false)
+                   {
+                       ProgressString = adp.ProgressOutput;
+                       ProgressValue = adp.ProgressValue;
+                       AllowUIToUpdate();
+                   }
+                   ProgressString = adp.ProgressOutput;
+                   ProgressValue = adp.ProgressValue;
+                   AllowUIToUpdate();
+               });
+            ThreadPool.QueueUserWorkItem((state) =>
+             {
+                 adp.GenerateGcode();
+                 ModelPrintDone = Visibility.Visible;
+             });
+
+        }
+        public String GcodeString;
+        private void Prontercae()
+        {
+            CurrentGcodePath = currentModelPath.Substring(0, CurrentModelPath.IndexOf('.')) + ".gcode";
+            GcodeString = System.IO.File.ReadAllText(CurrentGcodePath);
+            var LineList = GcodeString.Split('\n');
+
+            double currentX = 0;
+            double currentY = 0;
+            double currentZ = 0;
+            MeshGeometry3D mesh = new MeshGeometry3D();
+            MeshBuilder builder = new MeshBuilder(false,false);
+            List<Point3D> vrt = new List<Point3D>();
+            foreach (var item in LineList)
+            {
+                Point3D? point = GParser.getPoint(item.ToString());
+                if (point != null)
+                {
+                    Point3D Point_XYZ = (Point3D) point;
+                    if (Point_XYZ.X == -1)
+                    {
+                        Point_XYZ.X = currentX;
+                    }
+                    else
+                    {
+                        currentX = Point_XYZ.X;
+                    }
+                    if (Point_XYZ.Y == -1)
+                    {
+                        Point_XYZ.Y = currentY;
+                    }
+                    else
+                    {
+                        currentY = Point_XYZ.Y;
+                    }
+
+                    if (Point_XYZ.Z == -1)
+                    {
+                        Point_XYZ.Z = currentZ;
+                    }
+                    else
+                    {
+                        currentZ = Point_XYZ.Z;
+                    }
+
+                    vrt.Add(Point_XYZ);
+
+//                    builder.AddNode(Point_XYZ, Point_XYZ.ToVector3D(),new Point(Point_XYZ.X,Point_XYZ.Y));
+ //                  builder.a
+                    
+                }
+            }
+            
+            //int pos = 0;
+            //for (int i = 0; i < vrt.Count; i += 5, pos++)
+            //{
+            //    vrt[pos] = vrt[i];
+            //}
+            //vrt.RemoveRange(pos, vrt.Count - pos);
+
+            for (int i = 0; i < vrt.Count-1; i++)
+            {
+                builder.AddPipe(vrt[i], vrt[i + 1],0.25, 0.25, 18);
+                
+            }
+            
+            //builder.AddPolygon(vrt);
+            
+           // builder.AddRectangularMesh(vrt);
+           //builder.AddBox(new Point3D(10, 10, 10), 20, 20, 20);
+            CurrentMesh = new GeometryModel3D(builder.ToMesh(),Materials.Hue);
+            RaisePropertyChanged("CurrentMesh");
+            
+
+        }
+        private void Abort()
+        {
+            ModelPrint = Visibility.Collapsed;
+            ModelPrintDone = Visibility.Collapsed;
+            if (RotateX != 0 || RotateY != 0 || RotateZ != 0)
+            {
+                CurrentModelPath = CurrentModelPath.Substring(0, CurrentModelPath.IndexOf("_rotated.stl")) + ".stl";
+            }
+
+        }
+        void AllowUIToUpdate()
+        {
+
+            DispatcherFrame frame = new DispatcherFrame();
+
+            Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Render, new DispatcherOperationCallback(delegate(object parameter)
+            {
+
+                frame.Continue = false;
+
+                return null;
+
+            }), null);
+
+            Dispatcher.PushFrame(frame);
+
         }
         private async void FileOpen()
         {

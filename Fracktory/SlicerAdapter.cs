@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Fracktory
@@ -64,13 +65,30 @@ namespace Fracktory
             set;
         }
         public PrintConfiguration Config;
-
+        public Boolean HasFinished
+        {
+            get;
+            set;
+        }
+        public int ProgressValue
+        {
+            get;
+            set;
+        }
+        public string ProgressOutput
+        {
+            get;
+            set;
+        }
         public SlicerAdapter(String FileName)
         {
             if (FileName == "")
             {
                 return;
             }
+            ProgressOutput = "";
+            ProgressValue = 0;
+            HasFinished = false;
             ScaleFactor = 1;
             this.FileName= FileName;
             Process p = new Process();
@@ -201,9 +219,77 @@ namespace Fracktory
                 p.StartInfo.UseShellExecute = false;
                 p.StartInfo.RedirectStandardOutput = true;
                 p.Start();
-                string output = p.StandardOutput.ReadToEnd();
+                //string output = p.StandardOutput.ReadToEnd();
+                //Console.WriteLine(output);
+                string outputOld ="";
+                string outputNew ="";
+                String allOutput="";
+
+              
+                ThreadPool.QueueUserWorkItem((state) =>
+                {
+                    
+                    while (p.HasExited == false)
+                    {
+                        Thread.Sleep(300);
+                        if (p.StandardOutput.ReadLine() == null)
+                        {
+                            continue;
+                        }
+                        outputNew = p.StandardOutput.ReadLine();
+                        if (outputNew != outputOld)
+                        {
+                            Console.WriteLine(outputNew);
+                            outputOld = outputNew;
+                            allOutput += outputOld;
+                            if (outputOld.IndexOf("Exporting G-code")>-1)
+                            {
+                                ProgressOutput = "Exporing G-Code";
+                            }
+                            else if (outputOld.IndexOf("=>") > -1)
+                            {
+                                ProgressOutput = outputOld.Substring(3);
+                            }
+                            else
+                            {
+                                ProgressOutput = outputOld;
+                            }
+
+                            if (allOutput.IndexOf("Filament required") != -1)
+                            {
+                                ProgressValue = 100;
+                            }
+                            else if (allOutput.IndexOf("Exporting G-code") != -1)
+                            {
+                                ProgressValue = 60;
+                            }
+                            else if (allOutput.IndexOf("Generating horizontal shells") != -1)
+                            {
+                                ProgressValue = 40;
+                            }
+                            else if (allOutput.IndexOf(" Preparing infill surfaces") != -1)
+                            {
+                                ProgressValue = 30;
+                            }
+                            else if (allOutput.IndexOf(" Detecting solid surfaces") != -1)
+                            {
+                                ProgressValue = 30;
+                            }
+                            else if (allOutput.IndexOf("Generating perimeters") != -1)
+                            {
+                                ProgressValue = 20;
+                            }
+                            else if (allOutput.IndexOf("Processing triangulated mesh") != -1)
+                            {
+                                ProgressValue = 20;
+                            }
+                            
+                        }
+                    }
+                });
+                
                 p.WaitForExit();
-               
+                HasFinished = true;
             }
         }
 

@@ -14,6 +14,7 @@
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <ExpressionBlendVersion>5.0.40218.0</ExpressionBlendVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -26,7 +27,6 @@
     <MapFileExtensions>true</MapFileExtensions>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
-    <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
@@ -41,7 +41,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -51,6 +51,12 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Accessibility" />
+    <Reference Include="CefSharp">
+      <HintPath>E:\Fracktal\CefSharp Binary\Release\CefSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="CefSharp.Wpf">
+      <HintPath>E:\Fracktal\CefSharp Binary\Release\CefSharp.Wpf.dll</HintPath>
+    </Reference>
     <Reference Include="HelixToolkit.Wpf">
       <HintPath>..\packages\HelixToolkit.Wpf.2014.2.13.1\lib\NET45\HelixToolkit.Wpf.dll</HintPath>
     </Reference>
@@ -109,9 +115,11 @@
     <Compile Include="BackgroundImages.cs" />
     <Compile Include="DelegateCommand.cs" />
     <Compile Include="FileDialogService.cs" />
+    <Compile Include="GHelper.cs" />
     <Compile Include="IFileDialogService.cs" />
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Observable.cs" />
+    <Compile Include="SerialConsole.cs" />
     <Compile Include="SlicerAdapter.cs" />
     <Compile Include="VisualViewModel.cs" />
     <Page Include="MainWindow.xaml">
@@ -193,6 +201,7 @@
     <Resource Include="image\closeh.png" />
     <Resource Include="image\min.png" />
     <Resource Include="image\minh.png" />
+    <Resource Include="image\pause_normal.png" />
     <Resource Include="image\print.png" />
     <Resource Include="image\restore.png" />
     <Resource Include="image\restoreh.png" />
@@ -206,7 +215,77 @@
     <Resource Include="image\camera_reload.png" />
     <Resource Include="image\load.png" />
     <Resource Include="image\Reset.png" />
-    <SplashScreen Include="image\spash.jpg" />
+    <SplashScreen Include="image\splash.jpg" />
+    <Resource Include="image\cancel.png" />
+    <Resource Include="image\ok.png" />
+    <Resource Include="image\play.png" />
+    <Resource Include="image\play_hover.png" />
+    <Resource Include="image\pause.png" />
+    <Resource Include="image\pauseCircle.png" />
+    <Content Include="gCodeViewer\css\bootstrap-responsive.css" />
+    <Content Include="gCodeViewer\css\bootstrap-responsive.min.css" />
+    <Content Include="gCodeViewer\css\bootstrap.css" />
+    <Content Include="gCodeViewer\css\bootstrap.min.css" />
+    <Resource Include="gCodeViewer\css\cupertino\images\background.jpg" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_diagonals-thick_90_eeeeee_40x40.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_flat_15_cd0a0a_40x100.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_glass_100_e4f1fb_1x400.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_glass_50_3baae3_1x400.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_glass_80_d7ebf9_1x400.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_highlight-hard_100_f2f5f7_1x100.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_highlight-hard_70_000000_1x100.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_highlight-soft_100_deedf7_1x100.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-bg_highlight-soft_25_ffef8f_1x100.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-icons_2694e8_256x240.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-icons_2e83ff_256x240.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-icons_3d80b3_256x240.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-icons_72a7cf_256x240.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\ui-icons_ffffff_256x240.png" />
+    <Resource Include="gCodeViewer\css\cupertino\images\uiTabsArrow.png" />
+    <Content Include="gCodeViewer\css\cupertino\jquery-ui-1.9.0.custom.css" />
+    <Content Include="gCodeViewer\css\cupertino\jquery-ui-1.9.0.custom.min.css" />
+    <Content Include="gCodeViewer\css\style.css" />
+    <Resource Include="gCodeViewer\img\logo.png" />
+    <Content Include="gCodeViewer\index.html" />
+    <Content Include="gCodeViewer\js\analyzer.js" />
+    <Content Include="gCodeViewer\js\gCodeReader.js" />
+    <Content Include="gCodeViewer\js\renderer.js" />
+    <Content Include="gCodeViewer\js\renderer3d.js" />
+    <Content Include="gCodeViewer\js\ui.js" />
+    <Content Include="gCodeViewer\js\Worker.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-bootstrap-prettify.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-bootstrap-prettify.min.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-bootstrap.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-bootstrap.min.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-cookies.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-cookies.min.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-loader.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-loader.min.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-mocks.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-resource.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-resource.min.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-sanitize.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-sanitize.min.js" />
+    <Content Include="gCodeViewer\lib\angular\angular-scenario.js" />
+    <Content Include="gCodeViewer\lib\angular\angular.js" />
+    <Content Include="gCodeViewer\lib\angular\angular.min.js" />
+    <Content Include="gCodeViewer\lib\angular\jstd-scenario-adapter-config.js" />
+    <Content Include="gCodeViewer\lib\angular\jstd-scenario-adapter.js" />
+    <Content Include="gCodeViewer\lib\bootstrap-filestyle.min.js" />
+    <Content Include="gCodeViewer\lib\bootstrap.js" />
+    <Content Include="gCodeViewer\lib\bootstrap.min.js" />
+    <Content Include="gCodeViewer\lib\codemirror.css" />
+    <Content Include="gCodeViewer\lib\codemirror.js" />
+    <Content Include="gCodeViewer\lib\jquery-1.8.2.js" />
+    <Content Include="gCodeViewer\lib\jquery-1.8.2.min.js" />
+    <Content Include="gCodeViewer\lib\jquery-ui-1.9.0.custom.js" />
+    <Content Include="gCodeViewer\lib\modernizr.custom.09684.js" />
+    <Content Include="gCodeViewer\lib\mode_gcode\gcode_mode.js" />
+    <Content Include="gCodeViewer\lib\three.js" />
+    <Content Include="gCodeViewer\lib\three.min.js" />
+    <Content Include="gCodeViewer\lib\TrackballControls.js" />
+    <Content Include="gCodeViewer\lib\zlib.min.js" />
+    <Resource Include="image\home.png" />
     <Content Include="Slic3r\cpfworkrt\libgcc_s_sjlj-1.dll" />
     <Content Include="Slic3r\cpfworkrt\libstdc++-6.dll" />
     <Content Include="Slic3r\cpfworkrt\perl514.dll" />
@@ -281,7 +360,8 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)Slic3r"  "$(TargetDir)Slic3r"  /s /e /i /c /y
-xcopy "$(ProjectDir)Configuration"  "$(TargetDir)Configuration"  /s /e /i /c /y</PostBuildEvent>
+xcopy "$(ProjectDir)Configuration"  "$(TargetDir)Configuration"  /s /e /i /c /y
+xcopy "$(ProjectDir)gCodeViewer"  "$(TargetDir)gCodeViewer"  /s /e /i /c /y</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>

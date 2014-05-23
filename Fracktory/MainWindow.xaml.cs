@@ -5,27 +5,45 @@ using System.Windows.Media.Imaging;
 using WinInterop = System.Windows.Interop;
 using System.Runtime.InteropServices;
 using System.Windows.Media.Media3D;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 using System.IO;
-using System.Collections.Generic;
+using CefSharp;
+using System.Windows.Shapes;
+using System.Windows.Media;
 namespace Fracktory
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
+
     public partial class MainWindow : Window
     {
         public Model3D currentModel;
         public PrintConfiguration config;
-
+        
         public MainWindow()
         {
             InitializeComponent();
-            this.DataContext = new MainViewModel(new FileDialogService(), Viewport,RotatorX,RotatorY,RotatorZ,ScaleXYZ,config);
+            this.DataContext = new MainViewModel(new FileDialogService(), Viewport, RotatorX, RotatorY, RotatorZ, ScaleXYZ, config);
             FracktoryWindow.Loaded += new RoutedEventHandler(win_Loaded);
             FracktoryWindow.SourceInitialized += new EventHandler(win_SourceInitialized);
+
+            CefSharp.Settings settings = new CefSharp.Settings();
+            CefSharp.BrowserSettings browserSettings = new BrowserSettings();
+            browserSettings.FileAccessFromFileUrlsAllowed = true;
+            browserSettings.UniversalAccessFromFileUrlsAllowed = true;
+            browserSettings.TextAreaResizeDisabled = true;
+            
+        settings.PackLoadingDisabled = true;
+        if (CEF.Initialize(settings)){
+            CefSharp.Wpf.WebView web_view = new CefSharp.Wpf.WebView(AssemblyDirectory+  @"/gCodeViewer/index.html",browserSettings);
+            grid1.Children.Add(web_view);
+            
+            //730 x 460
+
+           // web_view.Address = "file:///E:/Fracktal/gCodeViewer-master2/index.html";
+        }
+            //Uri uri = new Uri(@"pack://application:,,,/gCodeViewer/index.html");
+            //Stream source = Application.GetContentStream(uri).Stream;
+            //wbMain.NavigateToStream(source);
             
         }
 
@@ -40,7 +58,7 @@ namespace Fracktory
 
 
 
-        private static System.IntPtr WindowProc(System.IntPtr hwnd,int msg,System.IntPtr wParam,System.IntPtr lParam,ref bool handled)
+        private static System.IntPtr WindowProc(System.IntPtr hwnd, int msg, System.IntPtr wParam, System.IntPtr lParam, ref bool handled)
         {
             switch (msg)
             {
@@ -125,7 +143,7 @@ namespace Fracktory
 
         void win_Loaded(object sender, RoutedEventArgs e)
         {
-           // FracktoryWindow.WindowState = WindowState.Maximized;
+            // FracktoryWindow.WindowState = WindowState.Maximized;
         }
 
 
@@ -264,7 +282,7 @@ namespace Fracktory
         [DllImport("User32")]
         internal static extern IntPtr MonitorFromWindow(IntPtr handle, int flags);
 
-#endregion
+        #endregion
 
         private void Grid_MouseMove(object sender, MouseEventArgs e)
         {
@@ -273,7 +291,7 @@ namespace Fracktory
                 if (WindowState == WindowState.Maximized)
                 {
                     this.WindowState = WindowState.Normal;
-                  
+
                 }
 
                 this.DragMove();
@@ -282,7 +300,7 @@ namespace Fracktory
 
         private void bMin_MouseMove(object sender, MouseEventArgs e)
         {
-            imgMin.Source = new BitmapImage(new Uri("image/minh.png",UriKind.Relative));
+            imgMin.Source = new BitmapImage(new Uri("image/minh.png", UriKind.Relative));
         }
 
         private void bMin_MouseLeave(object sender, MouseEventArgs e)
@@ -307,7 +325,7 @@ namespace Fracktory
 
         private void bRestore_Click(object sender, RoutedEventArgs e)
         {
-            if (WindowState==WindowState.Maximized)
+            if (WindowState == WindowState.Maximized)
             {
                 this.WindowState = WindowState.Normal;
             }
@@ -315,7 +333,7 @@ namespace Fracktory
             {
                 this.WindowState = WindowState.Maximized;
             }
-           
+
         }
 
         private void bClose_MouseEnter(object sender, MouseEventArgs e)
@@ -375,8 +393,8 @@ namespace Fracktory
             TabPronterface.IsSelected = true;
         }
 
-      
-#endregion
+
+        #endregion
 
         private void tglRotate_Click(object sender, RoutedEventArgs e)
         {
@@ -418,9 +436,14 @@ namespace Fracktory
 
         private void btnPrint_Click(object sender, RoutedEventArgs e)
         {
+            Menu.IsEnabled = false;
+
+
+
+
             if (FilamentType.SelectedIndex == 0)//abs
             {
-                config = new PrintConfiguration(PrintMaterial.ABS);              
+                config = new PrintConfiguration(PrintMaterial.ABS);
             }
             else if (FilamentType.SelectedIndex == 1)//pla
             {
@@ -479,7 +502,7 @@ namespace Fracktory
             {
                 config.ExtraConfiguration["fill-density"] = "0.4"; //medium
             }
-            
+
             config.ExtraConfiguration["infill-every-layers"] = CombineInfillEvery.Value.ToString();
             if ((bool) OnlyInfillWhenNeeded.IsChecked)
             {
@@ -518,8 +541,12 @@ namespace Fracktory
             {
                 config.ExtraConfiguration["infill-first"] = "0";
             }
-            ((MainViewModel) (this.DataContext)).PrintConfig=config;
 
+
+                ((MainViewModel) (this.DataContext)).PrintConfig = config;
+
+                Menu.IsEnabled = true;
+            
         }
 
         private void FilamentType_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -552,7 +579,8 @@ namespace Fracktory
             {
                 return;
             }
-            string path = System.IO.Path.Combine( AssemblyDirectory + jsonPath);
+            
+            string path = System.IO.Path.Combine(AssemblyDirectory + jsonPath);
             string configuration = System.IO.File.ReadAllText(path);
             JObject JsonConfiguration = JObject.Parse(configuration);
             ExtruderFirstLayer.Value = Convert.ToInt32(JsonConfiguration["ExtruderFirstLayer"].ToString());
@@ -576,14 +604,52 @@ namespace Fracktory
                 string codeBase = Assembly.GetExecutingAssembly().CodeBase;
                 UriBuilder uri = new UriBuilder(codeBase);
                 string path = Uri.UnescapeDataString(uri.Path);
-                return Path.GetDirectoryName(path);
+                return System.IO.Path.GetDirectoryName(path);
             }
         }
+        private void OpenPronterface(object sender, RoutedEventArgs e)
+        {
+            TabPronterface.IsSelected = true;
+        }
+        private void wbMain_Loaded(object sender, RoutedEventArgs e)
+        {
 
+        }
 
+        private void canvas_MouseMove(object sender, MouseEventArgs e)
+        {
+            canvas.Children.Clear();
+            Line l = new Line();
+            l.X1 = e.GetPosition(canvas).X;
+            l.X2 = e.GetPosition(canvas).X;
+            l.Y1 = 0;
+            l.Y2 = 200;
+            l.Stroke = SystemColors.WindowFrameBrush;
+
+            Line l1 = new Line();
+            l1.Y1 = e.GetPosition(canvas).Y;
+            l1.Y2 = e.GetPosition(canvas).Y;
+            l1.X1 = 0;
+            l1.X2 = 200;
+            l1.Stroke = SystemColors.WindowFrameBrush;
+            canvas.Children.Add(l);
+            canvas.Children.Add(l1);
+            currentX.Value = (int?) Math.Truncate(e.GetPosition(canvas).X);
+            currentY.Value = (int?) Math.Truncate(e.GetPosition(canvas).Y);
+            currentZ.Value = (int?) ZSlider.Value;
+            
+        }
+
+        private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            //currentX.Value = (int?) Math.Truncate(e.GetPosition(canvas).X);
+            //currentY.Value = (int?) Math.Truncate(e.GetPosition(canvas).Y);
+            //currentZ.Value = (int?)ZSlider.Value;
+        }
+
+        private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
     }
-
-
-
-
 }
