@@ -8,7 +8,7 @@ using System.Windows.Media.Media3D;
 using Newtonsoft.Json.Linq;
 using System.Reflection;
 using System.IO;
-using CefSharp;
+//using CefSharp;
 using System.Windows.Shapes;
 using System.Windows.Media;
 namespace Fracktory
@@ -25,22 +25,24 @@ namespace Fracktory
             this.DataContext = new MainViewModel(new FileDialogService(), Viewport, RotatorX, RotatorY, RotatorZ, ScaleXYZ, config);
             FracktoryWindow.Loaded += new RoutedEventHandler(win_Loaded);
             FracktoryWindow.SourceInitialized += new EventHandler(win_SourceInitialized);
-
-            CefSharp.Settings settings = new CefSharp.Settings();
-            CefSharp.BrowserSettings browserSettings = new BrowserSettings();
-            browserSettings.FileAccessFromFileUrlsAllowed = true;
-            browserSettings.UniversalAccessFromFileUrlsAllowed = true;
-            browserSettings.TextAreaResizeDisabled = true;
+            ((MainViewModel) (this.DataContext)).GcodeCanvas = GcodeCanvas;
+            ((MainViewModel) (this.DataContext)).GcodeCanvasWidth = FracktoryWindow.Width - 272;
+            ((MainViewModel) (this.DataContext)).GcodeCanvasHeight = FracktoryWindow.Height - 150;
+        //    CefSharp.Settings settings = new CefSharp.Settings();
+        //    CefSharp.BrowserSettings browserSettings = new BrowserSettings();
+        //    browserSettings.FileAccessFromFileUrlsAllowed = true;
+        //    browserSettings.UniversalAccessFromFileUrlsAllowed = true;
+        //    browserSettings.TextAreaResizeDisabled = true;
             
-        settings.PackLoadingDisabled = true;
-        if (CEF.Initialize(settings)){
-            CefSharp.Wpf.WebView web_view = new CefSharp.Wpf.WebView(AssemblyDirectory+  @"/gCodeViewer/index.html",browserSettings);
-            grid1.Children.Add(web_view);
+        //settings.PackLoadingDisabled = true;
+        //if (CEF.Initialize(settings)){
+        //    CefSharp.Wpf.WebView web_view = new CefSharp.Wpf.WebView(AssemblyDirectory+  @"/gCodeViewer/index.html",browserSettings);
+        //    grid1.Children.Add(web_view);
             
             //730 x 460
 
            // web_view.Address = "file:///E:/Fracktal/gCodeViewer-master2/index.html";
-        }
+        //}
             //Uri uri = new Uri(@"pack://application:,,,/gCodeViewer/index.html");
             //Stream source = Application.GetContentStream(uri).Stream;
             //wbMain.NavigateToStream(source);
@@ -642,13 +644,18 @@ namespace Fracktory
 
         private void canvas_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            //currentX.Value = (int?) Math.Truncate(e.GetPosition(canvas).X);
-            //currentY.Value = (int?) Math.Truncate(e.GetPosition(canvas).Y);
-            //currentZ.Value = (int?)ZSlider.Value;
+
         }
 
         private void canvas_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+
+        }
+
+        private void FracktoryWindow_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ((MainViewModel) (this.DataContext)).GcodeCanvasWidth = FracktoryWindow.Width - 272;
+            ((MainViewModel) (this.DataContext)).GcodeCanvasHeight = FracktoryWindow.Height - 150;
 
         }
     }

@@ -235,60 +235,60 @@ namespace Fracktory
 
         #endregion
     }
-    public static class GParser
-    {
-        public static Point3D? getPoint(String GCode)
-        {
-            double X=-1;
-            double Y=-1;
-            double Z=-1;
-            double E=-1;
-            var TokenList = GCode.Split(' ').ToList<string>();
-            var CommentFlag = TokenList.IndexOf(";");
-            var ParanthesisFlag = TokenList.IndexOf("(");
-            var ClosedParanthesisFlag = TokenList.IndexOf(")");
-            int G1Flag = TokenList.IndexOf("G1");
-            Dictionary<string, double> TokenDictionary = new Dictionary<string, double>();
-            foreach (var Token in TokenList)
-            {
-                if (Token.Count() > 0 && G1Flag >=0 && (CommentFlag < 0 || TokenList.IndexOf(Token) < CommentFlag) && (ParanthesisFlag < 0 || TokenList.IndexOf(Token) < ParanthesisFlag))
-                {
-                    if (Token[0] == 'X')
-                    {
-                        X = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
-                        TokenDictionary.Add("X", X);
-                    }
-                    else if (Token[0] == 'Y')
-                    {
-                        Y = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
-                        TokenDictionary.Add("Y", Y);
-                    }
-                    else if (Token[0] == 'Z')
-                    {
-                        Z = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
-                        TokenDictionary.Add("Z", Z);
-                    }
-                    else if (Token[0] == 'E')
-                    {
-                        E = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
-                        TokenDictionary.Add("E", E);
-                    }
-                }
-            }
-            if (G1Flag >= 0)
-            {
-                if (X != -1)
-                    X = X - 100;
-                if (Y != -1)
-                    Y = Y - 100;
-                return new Point3D(X, Y, Z);
-            }
+    //public static class GParser
+    //{
+    //    public static Point3D? getPoint(String GCode)
+    //    {
+    //        double X=-1;
+    //        double Y=-1;
+    //        double Z=-1;
+    //        double E=-1;
+    //        var TokenList = GCode.Split(' ').ToList<string>();
+    //        var CommentFlag = TokenList.IndexOf(";");
+    //        var ParanthesisFlag = TokenList.IndexOf("(");
+    //        var ClosedParanthesisFlag = TokenList.IndexOf(")");
+    //        int G1Flag = TokenList.IndexOf("G1");
+    //        Dictionary<string, double> TokenDictionary = new Dictionary<string, double>();
+    //        foreach (var Token in TokenList)
+    //        {
+    //            if (Token.Count() > 0 && G1Flag >=0 && (CommentFlag < 0 || TokenList.IndexOf(Token) < CommentFlag) && (ParanthesisFlag < 0 || TokenList.IndexOf(Token) < ParanthesisFlag))
+    //            {
+    //                if (Token[0] == 'X')
+    //                {
+    //                    X = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
+    //                    TokenDictionary.Add("X", X);
+    //                }
+    //                else if (Token[0] == 'Y')
+    //                {
+    //                    Y = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
+    //                    TokenDictionary.Add("Y", Y);
+    //                }
+    //                else if (Token[0] == 'Z')
+    //                {
+    //                    Z = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
+    //                    TokenDictionary.Add("Z", Z);
+    //                }
+    //                else if (Token[0] == 'E')
+    //                {
+    //                    E = double.Parse(Token.Substring(1), CultureInfo.InvariantCulture.NumberFormat);
+    //                    TokenDictionary.Add("E", E);
+    //                }
+    //            }
+    //        }
+    //        if (G1Flag >= 0)
+    //        {
+    //            if (X != -1)
+    //                X = X - 100;
+    //            if (Y != -1)
+    //                Y = Y - 100;
+    //            return new Point3D(X, Y, Z);
+    //        }
             
-            return null;
-            }
+    //        return null;
+    //        }
 
         
 
-    }
+    //}
 
 }

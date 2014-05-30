@@ -13,8 +13,11 @@ namespace Fracktory
     using System.Threading.Tasks;
     using System.Windows;
     using System.Windows.Input;
+    using System.Windows.Media;
     using System.Windows.Media.Media3D;
+    using System.Windows.Shapes;
     using System.Windows.Threading;
+    using System.Windows.Controls;
     using HelixToolkit.Wpf;
 
     //[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
@@ -60,7 +63,102 @@ namespace Fracktory
                 RaisePropertyChanged("CurrentMesh");
             }
         }
+        public List<List<FivePoint>> Gcode;
+        private Canvas gcodeCanvas;
+        public Canvas GcodeCanvas
+        {
+            get
+            {
+                return gcodeCanvas;
+            }
+            set
+            {
+                gcodeCanvas = value;
+                RaisePropertyChanged("GcodeCanvas");
+            }
+        }
 
+
+        private Double gcodeCanvasWidth;
+        public Double GcodeCanvasWidth
+        {
+            get
+            {
+                return gcodeCanvasWidth;
+            }
+            set
+            {
+                gcodeCanvasWidth = value;
+                RaisePropertyChanged("GcodeCanvasWidth");
+
+                if (Gcode != null && Gcode.Count > 0)
+                {
+                    GcodeCanvas.Children.Clear();
+                    double maxX = MaxX(Gcode);
+                    double maxY = MaxY(Gcode);
+                    double scaleX = GcodeCanvasWidth / maxX;
+                    double scaleY = GcodeCanvasHeight / maxY;
+                    double scale = Math.Min(scaleY, scaleX);
+                    drawLines(SliderLayerValue, maxX, maxY, scale, -1);
+                }
+              //  drawLines((int) SliderLayer.Value);
+            }
+        }
+
+        private Double gcodeCanvasHeight;
+        public Double GcodeCanvasHeight
+        {
+            get
+            {
+                return gcodeCanvasHeight;
+            }
+            set
+            {
+                gcodeCanvasHeight = value;
+                RaisePropertyChanged("GcodeCanvasHeight");
+              //  drawLines((int) SliderLayer.Value);
+                if (Gcode != null && Gcode.Count > 0)
+                {
+                    GcodeCanvas.Children.Clear();
+                    double maxX = MaxX(Gcode);
+                    double maxY = MaxY(Gcode);
+                    double scaleX = GcodeCanvasWidth / maxX;
+                    double scaleY = GcodeCanvasHeight / maxY;
+                    double scale = Math.Min(scaleY, scaleX);
+                    drawLines(SliderLayerValue, maxX, maxY, scale, -1);
+                }
+            }
+        }
+
+
+        private int sliderLayerValue;
+        public int SliderLayerValue
+        {
+            get
+            {
+                return sliderLayerValue;
+            }
+            set
+            {
+                sliderLayerValue = value;
+                RaisePropertyChanged("SliderLayerValue");
+              
+            }
+        }
+        private Slider sliderIntraLayer;
+        public Slider SliderIntraLayer
+        {
+            get
+            {
+                return sliderIntraLayer;
+            }
+            set
+            {
+                sliderIntraLayer = value;
+                RaisePropertyChanged("SliderIntraLayer");
+            }
+        }
+      
         private double rotateX;
         public double RotateX
         {
@@ -452,7 +550,7 @@ namespace Fracktory
             {
                 throw new ArgumentNullException("viewport");
             }
-            
+
             this.printConfig = PrintConfig;
             ScaleFactor = 100;
             SizeX = SizeY = SizeZ = 0;
@@ -473,7 +571,7 @@ namespace Fracktory
             this.ViewScaleCommand = new DelegateCommand(this.ViewScale);
             this.ResetSolidCommand = new DelegateCommand(this.ResetSolid);
             this.PrintCommand = new DelegateCommand(this.GenerateGCODE);
-            this.PronterfaceCommand = new DelegateCommand(this.Prontercae);
+            this.PronterfaceCommand = new DelegateCommand(this.Pronterface);
             this.AbortCommand = new DelegateCommand(this.Abort);
             this.ApplicationTitle = "Fracktory";
             ModelLoaded = Visibility.Collapsed;
@@ -486,6 +584,15 @@ namespace Fracktory
             {
                 this.Elements.Add(new VisualViewModel(c));
             }
+
+            
+            SliderLayerValue = 0;
+            SliderIntraLayer = new Slider();
+            GcodeCanvas = new Canvas();
+            GcodeCanvasHeight = 453;
+            GcodeCanvasWidth = 752;
+
+            drawGCode(@"C:\Users\Amit Sengupta\Downloads\octopus2.gcode");
         }
 
         private static void FileExit()
@@ -637,78 +744,10 @@ namespace Fracktory
 
         }
         public String GcodeString;
-        private void Prontercae()
+        private void Pronterface()
         {
             CurrentGcodePath = currentModelPath.Substring(0, CurrentModelPath.IndexOf('.')) + ".gcode";
-            GcodeString = System.IO.File.ReadAllText(CurrentGcodePath);
-            var LineList = GcodeString.Split('\n');
-
-            double currentX = 0;
-            double currentY = 0;
-            double currentZ = 0;
-            MeshGeometry3D mesh = new MeshGeometry3D();
-            MeshBuilder builder = new MeshBuilder(false,false);
-            List<Point3D> vrt = new List<Point3D>();
-            foreach (var item in LineList)
-            {
-                Point3D? point = GParser.getPoint(item.ToString());
-                if (point != null)
-                {
-                    Point3D Point_XYZ = (Point3D) point;
-                    if (Point_XYZ.X == -1)
-                    {
-                        Point_XYZ.X = currentX;
-                    }
-                    else
-                    {
-                        currentX = Point_XYZ.X;
-                    }
-                    if (Point_XYZ.Y == -1)
-                    {
-                        Point_XYZ.Y = currentY;
-                    }
-                    else
-                    {
-                        currentY = Point_XYZ.Y;
-                    }
-
-                    if (Point_XYZ.Z == -1)
-                    {
-                        Point_XYZ.Z = currentZ;
-                    }
-                    else
-                    {
-                        currentZ = Point_XYZ.Z;
-                    }
-
-                    vrt.Add(Point_XYZ);
-
-//                    builder.AddNode(Point_XYZ, Point_XYZ.ToVector3D(),new Point(Point_XYZ.X,Point_XYZ.Y));
- //                  builder.a
-                    
-                }
-            }
-            
-            //int pos = 0;
-            //for (int i = 0; i < vrt.Count; i += 5, pos++)
-            //{
-            //    vrt[pos] = vrt[i];
-            //}
-            //vrt.RemoveRange(pos, vrt.Count - pos);
-
-            for (int i = 0; i < vrt.Count-1; i++)
-            {
-                builder.AddPipe(vrt[i], vrt[i + 1],0.25, 0.25, 18);
-                
-            }
-            
-            //builder.AddPolygon(vrt);
-            
-           // builder.AddRectangularMesh(vrt);
-           //builder.AddBox(new Point3D(10, 10, 10), 20, 20, 20);
-            CurrentMesh = new GeometryModel3D(builder.ToMesh(),Materials.Hue);
-            RaisePropertyChanged("CurrentMesh");
-            
+            drawGCode(CurrentGcodePath);
 
         }
         private void Abort()
@@ -782,6 +821,182 @@ namespace Fracktory
                 // Alt. 2 - create the model on the UI dispatcher
                 return mi.Load(model3DPath, this.dispatcher);
             });
+        }
+
+        private void drawGCode(String GcodePath)
+        {
+            String gcode = System.IO.File.ReadAllText(GcodePath);
+            String[] lines = gcode.Split('\n');
+            double X = 0, Y = 0, Z = 0.4;
+            int layer = 0;
+            FivePoint NextPoint = new FivePoint();
+            double layer_height = 0.2;
+            Gcode = new List<List<FivePoint>>();
+
+            Gcode.Add(new List<FivePoint>());
+            bool parseStrat = false;
+            foreach (var item in lines)
+            {
+                NextPoint = GParser.getPoint(item);
+
+                if (NextPoint != null)
+                {
+
+                    if (item.IndexOf("lift") != -1 || (NextPoint.X == -1 && NextPoint.Y == -1 && NextPoint.Z == -1))
+                        continue;
+
+                    if (!parseStrat)
+                    {
+                        if (NextPoint.Z != 0.40)
+                        {
+                            continue;
+                        }
+                        parseStrat = true;
+                    }
+                    if (NextPoint.Z == -1)
+                    {
+                        NextPoint.Z = Z;
+                    }
+                    else
+                    {
+                        if (Math.Abs(NextPoint.Z - Z - layer_height) <= 0.001)
+                        {
+                            Z = NextPoint.Z;
+
+                            if (Gcode[layer].Count != 0)
+                            {
+                                layer++;
+                                Gcode.Add(new List<FivePoint>());
+                            }
+                        }
+                        else
+                        {
+                            if (NextPoint.E == -10)
+                                continue;
+                            NextPoint.Z = Z;
+                        }
+
+                    }
+                    if (NextPoint.X == -1)
+                        NextPoint.X = X;
+                    else
+                        X = NextPoint.X;
+                    if (NextPoint.Y == -1)
+                        NextPoint.Y = Y;
+                    else
+                        Y = NextPoint.Y;
+
+
+                    Gcode[layer].Add(new FivePoint(NextPoint.X, NextPoint.Y, NextPoint.Z, NextPoint.E, NextPoint.F));
+
+                }
+            }
+            
+          
+            SliderIntraLayer.Maximum = Gcode[(int) SliderLayerValue].Count - 1;
+            SliderIntraLayer.Value = SliderIntraLayer.Maximum;
+
+            double maxX = MaxX(Gcode);
+            double maxY = MaxY(Gcode);
+            double scaleX = GcodeCanvasWidth / maxX;
+            double scaleY = GcodeCanvasHeight / maxY;
+            double scale = Math.Min(scaleY, scaleX);
+            drawLines(SliderLayerValue, maxX, maxY, scale,-1);
+
+            RaisePropertyChanged("SliderLayer");
+            RaisePropertyChanged("SliderIntraLayer");
+        }
+
+        double MaxX(List<List<FivePoint>> p)
+        {
+            double maxX = 0;
+            double minX = 2000;
+            for (int i = 0; i < p.Count; i++)
+			{
+                for (int j = 0; j < p[i].Count; j++)
+                {
+                    if (p[i][j].X > maxX)
+                    {
+                        maxX = p[i][j].X;
+                    }
+
+                    if (p[i][j].X < minX)
+                    {
+                        minX = p[i][j].X;
+                    }
+                }
+			}
+            return maxX-minX;
+        }
+        double MaxY(List<List<FivePoint>> p)
+        {
+            double maxY = 0;
+            double minY = 2000;
+            for (int i = 0; i < p.Count; i++)
+            {
+                for (int j = 0; j < p[i].Count; j++)
+                {
+                    if (p[i][j].Y > maxY)
+                    {
+                        maxY = p[i][j].Y;
+                    }
+                    if (p[i][j].Y < minY)
+                    {
+                        minY = p[i][j].Y;
+                    }
+                }
+            }
+            return maxY-minY;
+        }
+        void drawLines(int layerNo,double maxX, double maxY,double scale=1, int limit = -1)
+        {
+            if (Gcode == null)
+                return;
+            if (limit == -1)
+            {
+                limit = Gcode[layerNo].Count;
+                for (int i = 0; i < limit - 1; i++)
+                {
+                    drawLine(Gcode[layerNo][i], Gcode[layerNo][i + 1], scale,maxX,maxY);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < limit - 1; i++)
+                {
+                    drawLine(Gcode[layerNo][i], Gcode[layerNo][i + 1], scale, maxX, maxY);
+                }
+            }
+            RaisePropertyChanged("GcodeCanvas");
+        }
+        void drawLine(FivePoint P1, FivePoint P2, double scale, double maxX, double maxY)
+        {
+            
+            if (scale != Double.NaN)
+            {
+                
+                P1 = scaleP(P1, scale, maxX,  maxY);
+                P2 = scaleP(P2, scale, maxX,  maxY);
+            }
+            Line L = new Line();
+            L.X1 = P1.X;
+            L.Y1 = P1.Y;
+            L.X2 = P2.X;
+            L.Y2 = P2.Y;
+
+            if (P2.E == P1.E || P2.E == -1 || P2.E < P1.E)
+            {
+                L.Stroke = new SolidColorBrush(Colors.Green);
+            }
+            else
+            {
+                L.Stroke = new SolidColorBrush(Colors.Chocolate);
+            }
+            GcodeCanvas.Children.Add(L);
+        }
+        private FivePoint scaleP(FivePoint P, double scale, double maxX, double maxY)
+        {
+            return new FivePoint((P.X ) * scale  , (P.Y ) * scale  , P.Z, P.E, P.F);
         }
     }
 }

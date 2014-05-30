@@ -8,7 +8,7 @@
         xmlns:HelixToolkit="clr-namespace:HelixToolkit.Wpf;assembly=HelixToolkit.Wpf"
         xmlns:HelixToolkitSharp ="http://helixtoolkit.codeplex.com/wpf/SharpDX"
         xmlns:local ="clr-namespace:Fracktory"   
-        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None" ResizeMode="CanResizeWithGrip" MinWidth="1024" MinHeight="600" FontFamily="Raleway" Name="FracktoryWindow">
+        Title="Fracktory"  Height="600" Width="1024" Background="#FF38342F" Foreground="White" AllowsTransparency="True" WindowStyle="None" ResizeMode="CanResizeWithGrip" MinWidth="1024" MinHeight="600" FontFamily="Raleway" x:Name="FracktoryWindow" SizeChanged="FracktoryWindow_SizeChanged">
     <Grid>
         <Grid.Resources>
             <Style TargetType="{x:Type TabControl}">
@@ -881,9 +881,9 @@
                     </Grid>
                     <Grid Grid.Column="2">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="7*"/>
-                            <RowDefinition Height="1"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="1"/>
+                            <RowDefinition Height="75"/>
                         </Grid.RowDefinitions>
                         <Grid Grid.Row="1" Background="#FF38342F" />
                         <Grid Grid.Row="2">
@@ -1080,28 +1080,15 @@
                                 </Grid>
                             </Button>
                         </Grid>
-                        <!--<HelixToolkit:HelixViewport3D  ShowCoordinateSystem="True" x:Name="Viewport2"  CameraRotationMode="Turntable" ViewCubeLeftText="F" ViewCubeFrontText="R" ViewCubeRightText="B" ViewCubeBackText="L" RotateAroundMouseDownPoint="False" CameraInertiaFactor="0.95" IsInertiaEnabled="True" Grid.Row="0" >
-
-                            <HelixToolkit:HelixViewport3D.DefaultCamera>
-                                <PerspectiveCamera Position="0,-200,100" LookDirection="0,200,-100" UpDirection="0,0,1" FieldOfView="60" NearPlaneDistance=".001" />
-                            </HelixToolkit:HelixViewport3D.DefaultCamera>
-
-                            <HelixToolkit:MeshVisual3D Content="{Binding CurrentMesh}" />
-                        
-                            <ModelVisual3D x:Name="root2" >
-
-                                <HelixToolkit:CoordinateSystemVisual3D Transform="{HelixToolkit:Translate -100, -100, 0}" ArrowLengths="10" />
-                                <HelixToolkit:SunLight/>
-                                <HelixToolkit:GridLinesVisual3D Width="200" Length="200" MinorDistance="20" MajorDistance="10"  Thickness="0.3" x:Name="grid2"  />
-                                <HelixToolkit:CubeVisual3D  SideLength="200" Material="{HelixToolkit:Material White, Opacity=0}" Center="0,0,99.5"/>
-
-                            </ModelVisual3D>
-
-                        </HelixToolkit:HelixViewport3D>-->
-                        <!--<WebBrowser x:Name="wbMain" Loaded="wbMain_Loaded" Grid.Row="0" OpacityMask="#FFF7F7F7" />-->
-
-
-                        <Grid Name="grid1"></Grid>
+                        <Grid Name="gridCanvas">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                            </Grid.ColumnDefinitions>
+                            <Canvas x:Name="GcodeCanvas" Grid.Column="0" Width="{Binding GcodeCanvasWidth}" Height="{Binding GcodeCanvasHeight}" Background="#FFCF9090"/>
+                            <Slider Grid.Column="1" Orientation="Vertical" TickPlacement="TopLeft" x:Name="Slider" Value="{Binding SliderLayerValue}"/>
+                            
+                        </Grid>
 
 
                     </Grid>
